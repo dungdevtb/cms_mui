@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/JWTAuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import routes from './routes';
 import '../fake-db';
+import './index.css';
 
 const App = () => {
   const content = useRoutes(routes);

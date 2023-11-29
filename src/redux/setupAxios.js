@@ -6,9 +6,12 @@
 export default function setupAxios(axios, store) {
     axios.interceptors.request.use(
         config => {
-            const token = store.getState().auth.token;
-            if (token) {
-                config.headers['Authorization'] = 'Bearer ' + token;
+            const {
+                auth: { authToken }
+            } = store.getState();
+
+            if (authToken) {
+                config.headers.Authorization = `Bearer ${authToken}`;
             }
             console.log("Axios Interceptor: ", config);
             return config;

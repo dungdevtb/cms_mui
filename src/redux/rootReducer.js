@@ -6,7 +6,7 @@ import homeReducer from "./home/reducer";
 
 export const rootReducer = combineReducers({
     auth: auth.reducer,
-    home: homeReducer
+    homeReducer: homeReducer
 })
 
 export function* rootSaga() {
