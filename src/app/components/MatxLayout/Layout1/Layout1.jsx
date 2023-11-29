@@ -1,5 +1,5 @@
 import { useEffect, useRef, memo } from 'react';
-import { ThemeProvider, useMediaQuery, Box, styled, useTheme } from '@mui/material';
+import { ThemeProvider, useMediaQuery, Box, styled, useTheme, CircularProgress } from '@mui/material';
 import Scrollbar from 'react-perfect-scrollbar';
 import { Outlet } from 'react-router-dom';
 import { MatxSuspense } from 'app/components';
@@ -91,6 +91,7 @@ const Layout1 = () => {
           <Layout1Sidenav />
         </SidenavTheme>
       )}
+      {/* <div className='checkkkkkkkkkkkkkk'>dmmmmmmmmm</div> */}
 
       <LayoutContainer width={sidenavWidth} open={secondarySidebar.open}>
         {layout1Settings.topbar.show && layout1Settings.topbar.fixed && (
