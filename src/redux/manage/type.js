@@ -1,0 +1,4 @@
+export const Types = {
+    SAVE_LIST_PERMISSION: 'SAVE_LIST_PERMISSION',
+    SAVE_LIST_ROLE: 'SAVE_LIST_ROLE',
+}

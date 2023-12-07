@@ -4,9 +4,12 @@ import { Box, styled, useTheme } from '@mui/material';
 import { Paragraph } from 'app/components/Typography';
 import useAuth from 'app/hooks/useAuth';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { actionLogin } from 'redux/home/action';
+import { message } from 'antd';
 
 const FlexBox = styled(Box)(() => ({ display: 'flex', alignItems: 'center' }));
 
@@ -34,8 +37,8 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const initialValues = {
-  email: 'jason@ui-lib.com',
-  password: 'dummyPass',
+  email: 'admin@gmail.com',
+  password: '123123',
   remember: true
 };
 
@@ -52,13 +55,28 @@ const JwtLogin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const dispatch = useDispatch();
 
-  const handleFormSubmit = async (values) => {
+  // const { login } = useAuth();
+
+  const handleFormSubmit = (values) => {
     setLoading(true);
+
+    const dataSubmit = {
+      email: values.email.trim(),
+      password: values.password.trim()
+    };
+
     try {
-      await login(values.email, values.password);
-      navigate('/');
+      // await login(values.email, values.password);
+      // navigate('/');
+
+      const res = dispatch(actionLogin(dataSubmit));
+      if (res) {
+        navigate('/');
+      } else {
+        message.error('Đăng nhập thất bại');
+      }
     } catch (e) {
       setLoading(false);
     }

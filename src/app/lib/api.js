@@ -2,7 +2,6 @@ import axios from "axios"
 
 export const fetchApi = async (url, method = 'get', body, headers) => {
     let token = localStorage.getItem('token');
-    console.log("fetchAPI", url, process.env.REACT_APP_API_URL);
 
     try {
         let opts = {
@@ -15,6 +14,7 @@ export const fetchApi = async (url, method = 'get', body, headers) => {
                 'token': token,
             }
         }
+
         if (headers) {
             opts = {
                 ...opts,

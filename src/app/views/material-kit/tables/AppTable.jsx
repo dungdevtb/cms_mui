@@ -19,13 +19,13 @@ const AppTable = () => {
         <Breadcrumb routeSegments={[{ name: "Material", path: "/material" }, { name: "Table" }]} />
       </Box>
 
-      <SimpleCard title="Simple Table">
-        <SimpleTable />
-      </SimpleCard>
+      {/* <SimpleCard title="Danh sách quyền"> */}
+      <SimpleTable />
+      {/* </SimpleCard> */}
 
-      <SimpleCard title="Pagination Table">
+      {/* <SimpleCard title="Pagination Table">
         <PaginationTable />
-      </SimpleCard>
+      </SimpleCard> */}
     </Container>
   );
 };

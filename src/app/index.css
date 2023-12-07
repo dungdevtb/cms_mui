@@ -5,3 +5,8 @@
 .tmar-spin-container .ant-spin-spinning.ant-spin {
   max-height: 81vh !important;
 }/*# sourceMappingURL=index.css.map */
+
+
+.css-1bwc6vp-MuiTable-root tbody tr td {
+  text-transform: none;
+}

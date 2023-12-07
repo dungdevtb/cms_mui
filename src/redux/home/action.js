@@ -4,25 +4,27 @@ import { message } from 'antd';
 import { fetchApi } from 'app/lib/api';
 
 export const actionLoading = (payload) => ({
-    type: Types.SAVE_LOADINGS,
+    type: Types.SAVE_LOADING,
     payload,
 })
 
 export const actionLogin = (payload) => async (dispatch, getState) => {
     try {
         const response = await fetchApi('/login', 'post', payload)
-        if (response.code !== 200) {
+
+
+        if (response.statusCode !== 200) {
             dispatch(actionLoading(false))
-            return checkErrorCode(response?.code, response?.message)
+            return checkErrorCode(response?.statusCode, response?.message)
         }
 
         const token = response?.data?.token || null
         localStorage.setItem('token', token)
 
         let listPermissions = []
-        for (let item of response?.data?.list_permission) {
-            if (item?.permission.length > 0) {
-                listPermissions = [...listPermissions, ...item?.permission.map(it => it?.slug)]
+        if (response?.data?.list_permission.length > 0) {
+            for (let item of response?.data?.list_permission) {
+                listPermissions = [...listPermissions, item.slug]
             }
         }
 
@@ -39,7 +41,7 @@ export const actionLogin = (payload) => async (dispatch, getState) => {
 export const actionLogout = () => async () => {
     try {
         localStorage.removeItem('token')
-        window.location.assign('/login')
+        window.location.assign('/session/signin')
         return;
     } catch (error) {
         alert("Error Logout: ", error)
@@ -57,6 +59,8 @@ export const actionSaveListUserLoginPermission = (payload) => ({
 })
 
 export const checkErrorCode = async (code, errorMessage) => {
+
+
     switch (code) {
         case 400: {
             message.error(errorMessage || "Có lỗi xảy ra vui lòng thử lại!");

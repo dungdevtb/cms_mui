@@ -13,7 +13,7 @@ export default function setupAxios(axios, store) {
             if (authToken) {
                 config.headers.Authorization = `Bearer ${authToken}`;
             }
-            console.log("Axios Interceptor: ", config);
+            // console.log("Axios Interceptor: ", config);
             return config;
         },
 

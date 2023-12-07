@@ -6,7 +6,7 @@ export const actionUploadOneFile = (payload) => async (dispatch, getState) => {
     try {
         dispatch(actionLoading(true))
         const response = await fetchApiUpload('/api/upload/uploadImage', 'post', payload)
-        if (response.code === 400) {
+        if (response.statusCode === 400) {
             message.error(response?.message)
             setTimeout(() => {
                 message.destroy()
@@ -25,7 +25,7 @@ export const actionUploadMultipleFile = (payload) => async (dispatch, getState) 
     try {
         dispatch(actionLoading(true))
         const response = await fetchApiUpload('/api/upload/uploadMultipleImage', 'post', payload)
-        if (response.code === 400) {
+        if (response.statusCode === 400) {
             message.error(response?.message)
             setTimeout(() => {
                 message.destroy()
