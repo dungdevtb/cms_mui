@@ -1,22 +1,127 @@
-import { Box, Button, Fab, Icon, IconButton, styled } from '@mui/material';
+import { Box, Button, Fab, Icon, IconButton, styled, CircularProgress } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Upload, message } from 'antd';
 import { Breadcrumb, SimpleCard } from 'app/components';
+import { useState } from 'react';
+import { actionUploadOneFile } from 'redux/upload/action';
+import { useDispatch } from 'react-redux';
 
 const AppButtonRoot = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
   '& .breadcrumb': {
     marginBottom: '30px',
-    [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
+    [theme.breakpoints.down('sm')]: { marginBottom: '16px' }
   },
   '& .button': { margin: theme.spacing(1) },
-  '& .input': { display: 'none' },
+  '& .input': { display: 'none' }
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
+  margin: theme.spacing(1)
 }));
 
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  console.log(reader, 'reader');
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
+const beforeUpload = (file) => {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  if (!isJpgOrPng) {
+    message.error('You can only upload JPG/PNG file!');
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    message.error('Image must smaller than 2MB!');
+  }
+  return isJpgOrPng && isLt2M;
+};
+
 export default function AppButton() {
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState();
+
+  const dispatch = useDispatch();
+  const [fileUpload, setFileUpload] = useState(null);
+  const [oldFileUpload, setOldFileUpload] = useState(
+    'https://api.hanagold.vn/uploads/1640839689807-defaultUpload.png'
+  );
+
+  const uploadButton = (
+    <div>
+      {loading ? <CircularProgress /> : <AddIcon />}
+      <div
+        style={{
+          marginTop: 8
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
+
+  const handleChange = (info) => {
+    if (info.file.status === 'uploading') {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (url) => {
+        setLoading(false);
+        setImageUrl(url);
+      });
+    }
+  };
+
+  const uploadProps = {
+    // multiple: true,
+    accept: 'image/png,image/jpeg,image/svg+xml,image/webp',
+    beforeUpload: (file, fileList) => {
+      if (
+        file.type !== 'image/png' &&
+        file.type !== 'image/jpeg' &&
+        file.type !== 'image/svg+xml' &&
+        file.type !== 'image/webp'
+      ) {
+        message.error(`${file.name} is not a image file`);
+        setTimeout(() => {
+          message.destroy();
+        }, 2000);
+        return;
+      } else {
+        if (file.size > 10000000) {
+          message.error('File size > 1 MB!');
+          setTimeout(() => {
+            message.destroy();
+          }, 2000);
+          return;
+        }
+        file.newImg = URL.createObjectURL(file);
+        setFileUpload(file);
+      }
+      return false;
+    }
+  };
+
+  console.log(fileUpload, 'imageUrl');
+
+  const handleUpload = async () => {
+    if (!fileUpload && !oldFileUpload) {
+      return message.error('Vui lòng tải ảnh!');
+    }
+    let image = '';
+    if (fileUpload) {
+      let newUploadFile = new FormData();
+      newUploadFile.append('file', fileUpload);
+      image = await dispatch(actionUploadOneFile(newUploadFile));
+    }
+
+    console.log(image, 'image');
+  };
+
   return (
     <AppButtonRoot>
       <Box className="breadcrumb">
@@ -57,16 +162,49 @@ export default function AppButton() {
       <Box py="12px" />
 
       <SimpleCard title="text buttons">
-        <StyledButton>Default</StyledButton>
-        <StyledButton color="primary">Primary</StyledButton>
-        <StyledButton color="secondary">Secondary</StyledButton>
-        <StyledButton disabled>Disabled</StyledButton>
-        <StyledButton href="#text-buttons">Link</StyledButton>
+        <>
+          <StyledButton onClick={handleUpload}>Default</StyledButton>
+          <StyledButton color="primary">Primary</StyledButton>
+          <StyledButton color="secondary">Secondary</StyledButton>
+          <StyledButton disabled>Disabled</StyledButton>
+          <StyledButton href="#text-buttons">Link</StyledButton>
 
-        <input accept="image/*" className="input" id="text-button-file" multiple type="file" />
-        <label htmlFor="text-button-file">
-          <StyledButton component="span">Upload</StyledButton>
-        </label>
+          <input accept="image/*" className="input" id="text-button-file" multiple type="file" />
+          <label htmlFor="text-button-file">
+            <StyledButton component="span">Upload</StyledButton>
+          </label>
+        </>
+
+        {/* <Upload
+          name="avatar"
+          listType="picture-card"
+          className="avatar-uploader"
+          showUploadList={false}
+          action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="avatar"
+              style={{
+                width: '100%'
+              }}
+            />
+          ) : (
+            uploadButton
+          )}
+        </Upload> */}
+
+        <Upload {...uploadProps}>
+          <img
+            src={fileUpload?.newImg || oldFileUpload}
+            alt=""
+            className="rad--4"
+            style={{ objectFit: 'cover', width: '150px', height: '150px' }}
+          />
+        </Upload>
       </SimpleCard>
 
       <Box py="12px" />
