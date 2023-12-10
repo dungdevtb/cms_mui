@@ -4,7 +4,9 @@ import { Upload, message } from 'antd';
 import { Breadcrumb, SimpleCard } from 'app/components';
 import { useState } from 'react';
 import { actionUploadOneFile } from 'redux/upload/action';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { actionGetListProduct } from 'redux/product/action';
+import { useEffect } from 'react';
 
 const AppButtonRoot = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -75,6 +77,19 @@ export default function AppButton() {
       });
     }
   };
+
+  const { dataProduct } = useSelector(
+    (state) => ({
+      dataProduct: state.productReducer.dataProduct
+    }),
+    shallowEqual
+  );
+
+  // console.log(dataProduct, 'dataProduct');
+
+  useEffect(() => {
+    dispatch(actionGetListProduct());
+  }, []);
 
   const uploadProps = {
     // multiple: true,
