@@ -59,8 +59,6 @@ export const actionSaveListUserLoginPermission = (payload) => ({
 })
 
 export const checkErrorCode = async (code, errorMessage) => {
-
-
     switch (code) {
         case 400: {
             message.error(errorMessage || "Có lỗi xảy ra vui lòng thử lại!");

@@ -11,6 +11,16 @@ export const navigations = [
       { name: 'Error', iconText: '404', path: '/session/404' }
     ]
   },
+  {
+    name: 'Quản trị hệ thống',
+    icon: 'build',
+    children: [
+      { name: 'Quản lý admin', iconText: 'SI', path: '/admin/manage' },
+      { name: 'Quản lý vai trò', iconText: 'SU', path: '/admin/role' },
+      { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
+    ]
+  },
+
   { label: 'Components', type: 'label' },
   {
     name: 'Components',
@@ -39,7 +49,7 @@ export const navigations = [
     children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }]
   },
   {
-    name: 'Documentation',
+    name: 'Doc',
     icon: 'launch',
     type: 'extLink',
     path: 'http://demos.ui-lib.com/matx-react-doc/'

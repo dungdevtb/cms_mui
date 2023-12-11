@@ -9,15 +9,18 @@ import {
   TableHead,
   TableRow,
   TablePagination,
+  Tooltip
 } from "@mui/material";
+import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual } from "react-redux";
-import { actionGetListPermission, actionGetListRole, actionDeletePermission } from "redux/manage/action";
+import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
 import { useDispatch } from "react-redux";
 import { SimpleCard } from "app/components";
 import DialogCUPermission from "./DialogCUPermission";
 import Button from '@mui/material/Button';
 import { message } from "antd";
+import { useCallback } from "react";
 
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: "pre",
@@ -35,29 +38,29 @@ const SimpleTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [open, setOpen] = useState(false);
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [record, setRecord] = useState({});
 
-  const { listPermission, listRole } = useSelector(state => ({
+  const { listPermission } = useSelector(state => ({
     listPermission: state.manageReducer.listPermission,
-    listRole: state.manageReducer.listRole
   }), shallowEqual)
-
-  console.log(listRole, 'listRole');
 
   useEffect(() => {
     dispatch(actionGetListPermission())
-    dispatch(actionGetListRole())
   }, [dispatch])
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
+  const handleClickOpen = useCallback((itemEdit) => {
+    if (itemEdit) {
+      setRecord(itemEdit)
+    } else {
+      setRecord({})
+    }
+    setOpen(true)
+  }, []);
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  const handleClose = useCallback(() => {
+    setRecord({})
+    setOpen(false)
+  }, []);
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có muốn xóa?")) {
@@ -67,6 +70,15 @@ const SimpleTable = () => {
       }
     }
   }
+
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
   return (
     <SimpleCard title={
@@ -98,9 +110,18 @@ const SimpleTable = () => {
                   <TableCell align="center">{item.name}</TableCell>
                   <TableCell align="center">{item.slug}</TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => handleDelete(item?.id)}>
-                      <Icon color="error">close</Icon>
-                    </IconButton>
+                    <Tooltip title="Sửa">
+                      <IconButton>
+                        <Icon color="primary" onClick={() => handleClickOpen(item)}>
+                          <BorderColorOutlinedIcon />
+                        </Icon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xóa">
+                      <IconButton onClick={() => handleDelete(item?.id)}>
+                        <Icon color="error">close</Icon>
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -121,7 +142,13 @@ const SimpleTable = () => {
         />
       </Box>
 
-      <DialogCUPermission open={open} handleClose={handleClose} />
+      {open &&
+        <DialogCUPermission
+          open={open}
+          handleClose={handleClose}
+          record={record}
+        />
+      }
     </SimpleCard>
   );
 };

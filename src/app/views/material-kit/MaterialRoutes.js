@@ -16,6 +16,11 @@ const AppSnackbar = Loadable(lazy(() => import('./snackbar/AppSnackbar')));
 const AppAutoComplete = Loadable(lazy(() => import('./auto-complete/AppAutoComplete')));
 const AppExpansionPanel = Loadable(lazy(() => import('./expansion-panel/AppExpansionPanel')));
 
+
+const ManageAdmin = Loadable(lazy(() => import('./manage/ManageAdmin')))
+const ManageRole = Loadable(lazy(() => import('./manage/ManageRole')))
+const ManagePermission = Loadable(lazy(() => import('./manage/ManagePermission')))
+
 const materialRoutes = [
   { path: '/material/table', element: <AppTable /> },
   { path: '/material/form', element: <AppForm /> },
@@ -30,7 +35,13 @@ const materialRoutes = [
   { path: '/material/autocomplete', element: <AppAutoComplete /> },
   { path: '/material/expansion-panel', element: <AppExpansionPanel /> },
   { path: '/material/dialog', element: <AppDialog /> },
-  { path: '/material/snackbar', element: <AppSnackbar /> }
+  { path: '/material/snackbar', element: <AppSnackbar /> },
+
+  //manage
+  { path: '/admin/manage', element: <ManageAdmin /> },
+  { path: '/admin/role', element: <ManageRole /> },
+  { path: '/admin/permission', element: <ManagePermission /> },
+
 ];
 
 export default materialRoutes;

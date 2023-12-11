@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { convertToSlug } from 'app/lib/common';
-import { actionCUPermission } from 'redux/manage/action';
+import { actionCURole } from 'redux/manage/action';
 import { message } from 'antd';
 import { useDispatch } from 'react-redux';
 
@@ -17,7 +17,7 @@ const TextField = styled(TextValidator)(() => ({
     marginBottom: "16px",
 }));
 
-function DialogCUPermission({ open, handleClose, record }) {
+function DialogCURole({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
 
@@ -56,32 +56,30 @@ function DialogCUPermission({ open, handleClose, record }) {
             messageSuccess = "Cập nhật thành công!"
         }
 
-        dispatch(actionCUPermission(dataSubmit));
+        dispatch(actionCURole(dataSubmit));
         handleClose();
         return message.success(messageSuccess);
     };
 
     return (
         <Box>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="md">
-                <DialogTitle id="form-dialog-title">Thêm mới</DialogTitle>
+            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth>
+                <DialogTitle id="form-dialog-title">
+                    {record && record.id ? "Cập nhật" : "Thêm mới"}
+                </DialogTitle>
 
                 <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-                    <DialogContent>
-                        <DialogContentText>
-                            To subscribe to this website, please enter your email address here. We will send updates
-                            occasionally.
-                        </DialogContentText>
+                    <DialogContent dividers>
                         <Grid container spacing={6}>
                             <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <TextField
                                     type="text"
                                     name="name"
-                                    label="Tên quyền"
+                                    label="Tên vai trò"
                                     onChange={handleChange}
                                     value={dataSubmit.name || ""}
                                     validators={["required"]}
-                                    errorMessages={["Vui lòng nhập tên quyền!"]}
+                                    errorMessages={["Vui lòng nhập tên vai trò!"]}
                                 />
 
                                 <TextField
@@ -110,4 +108,4 @@ function DialogCUPermission({ open, handleClose, record }) {
     );
 }
 
-export default React.memo(DialogCUPermission); // DialogCUPermission
+export default React.memo(DialogCURole); // DialogCURole

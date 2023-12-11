@@ -71,13 +71,10 @@ const JwtLogin = () => {
       // await login(values.email, values.password);
       // navigate('/');
 
-      const res = dispatch(actionLogin(dataSubmit));
-      if (res) {
-        navigate('/');
-      } else {
-        message.error('Đăng nhập thất bại');
-      }
+      dispatch(actionLogin(dataSubmit));
+      navigate('/');
     } catch (e) {
+      message.error('Đăng nhập thất bại!');
       setLoading(false);
     }
   };

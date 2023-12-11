@@ -81,7 +81,6 @@ const AutocompleteCombo = () => {
         onChange={handleChange}
         filterOptions={filterOptions}
         getOptionLabel={(option) => {
-          // e.g value selected with enter, right from the input
           if (typeof option === 'string') {
             return option;
           }

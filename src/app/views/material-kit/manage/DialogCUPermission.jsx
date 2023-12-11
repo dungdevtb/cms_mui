@@ -2,15 +2,43 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Button,
     Dialog, DialogActions,
-    DialogContent, DialogTitle,
+    DialogContent,
     DialogContentText,
-    styled, Grid
+    styled, Grid,
+    Typography, IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { convertToSlug } from 'app/lib/common';
 import { actionCUPermission } from 'redux/manage/action';
 import { message } from 'antd';
 import { useDispatch } from 'react-redux';
+
+const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
+    margin: 0,
+    padding: theme.spacing(2),
+    '& .closeButton': {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500]
+    }
+}));
+
+const DialogTitle = (props) => {
+    const { children, onClose } = props;
+    return (
+        <DialogTitleRoot disableTypography>
+            <Typography variant="h6">{children}</Typography>
+            {onClose ? (
+                <IconButton aria-label="Close" className="closeButton" onClick={onClose}>
+                    <CloseIcon />
+                </IconButton>
+            ) : null}
+        </DialogTitleRoot>
+    );
+};
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -63,15 +91,21 @@ function DialogCUPermission({ open, handleClose, record }) {
 
     return (
         <Box>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="md">
-                <DialogTitle id="form-dialog-title">Thêm mới</DialogTitle>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="form-dialog-title"
+                fullWidth
+            >
+                <DialogTitle id="form-dialog-title" onClose={handleClose}>
+                    {record && record.id ? "Cập nhật" : "Thêm mới"}
+                </DialogTitle>
 
-                <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-                    <DialogContent>
-                        <DialogContentText>
-                            To subscribe to this website, please enter your email address here. We will send updates
-                            occasionally.
-                        </DialogContentText>
+                <ValidatorForm onSubmit={handleSubmit} >
+                    <DialogContent dividers >
+                        {/* <DialogContentText>
+                            To subscribe to this website, please enter your email address here.
+                        </DialogContentText> */}
                         <Grid container spacing={6}>
                             <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <TextField
@@ -82,6 +116,7 @@ function DialogCUPermission({ open, handleClose, record }) {
                                     value={dataSubmit.name || ""}
                                     validators={["required"]}
                                     errorMessages={["Vui lòng nhập tên quyền!"]}
+                                    style={{ width: '100%' }}
                                 />
 
                                 <TextField
@@ -90,6 +125,7 @@ function DialogCUPermission({ open, handleClose, record }) {
                                     label="Slug"
                                     disabled={true}
                                     value={dataSubmit.slug || ""}
+                                    style={{ width: '100%' }}
                                 />
                             </Grid>
                         </Grid>

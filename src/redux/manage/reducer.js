@@ -8,6 +8,10 @@ const intialState = {
     listRole: {
         paging: {},
         rows: [],
+    },
+    listAdmin: {
+        paging: {},
+        rows: [],
     }
 }
 
@@ -24,6 +28,12 @@ const reducer = (state = intialState, action) => {
             return {
                 ...newState,
                 listRole: action.payload
+            }
+
+        case Types.SAVE_LIST_ADMIN:
+            return {
+                ...newState,
+                listAdmin: action.payload
             }
         default:
             return { ...newState }
