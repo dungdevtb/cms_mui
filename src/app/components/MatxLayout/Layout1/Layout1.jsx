@@ -13,7 +13,6 @@ import Layout1Topbar from './Layout1Topbar';
 import { Spin } from 'antd';
 import { useSelector, shallowEqual } from "react-redux";
 
-
 const Layout1Root = styled(Box)(({ theme }) => ({
   display: 'flex',
   background: theme.palette.background.default
@@ -61,7 +60,6 @@ const Layout1 = () => {
     spin: state.homeReducer.spin,
   }), shallowEqual)
 
-  // console.log(spin, 'loadinggggggggggggggg');
   const getSidenavWidth = () => {
     switch (sidenavMode) {
       case 'full':
@@ -93,62 +91,62 @@ const Layout1 = () => {
   }, [isMdScreen]);
 
   return (
-    <Layout1Root className={layoutClasses}>
-      {showSidenav && sidenavMode !== 'close' && (
-        <SidenavTheme>
-          <Layout1Sidenav />
-        </SidenavTheme>
-      )}
-
-      {/* <Spin spinning={spin} wrapperClassName='tmar-spin-container'> */}
-      <LayoutContainer width={sidenavWidth} open={secondarySidebar.open}>
-        {layout1Settings.topbar.show && layout1Settings.topbar.fixed && (
-          <ThemeProvider theme={topbarTheme}>
-            <Layout1Topbar fixed={true} className="elevation-z8" />
-          </ThemeProvider>
+    <Spin spinning={spin} wrapperClassName='tmar-spin-container'>
+      <Layout1Root className={layoutClasses}>
+        {showSidenav && sidenavMode !== 'close' && (
+          <SidenavTheme>
+            <Layout1Sidenav />
+          </SidenavTheme>
         )}
 
-        {settings.perfectScrollbar && (
-          <StyledScrollBar>
-            {layout1Settings.topbar.show && !layout1Settings.topbar.fixed && (
-              <ThemeProvider theme={topbarTheme}>
-                <Layout1Topbar />
-              </ThemeProvider>
-            )}
-            <Box flexGrow={1} position="relative">
-              <MatxSuspense>
-                <Outlet />
-              </MatxSuspense>
-            </Box>
+        <LayoutContainer width={sidenavWidth} open={secondarySidebar.open}>
+          {layout1Settings.topbar.show && layout1Settings.topbar.fixed && (
+            <ThemeProvider theme={topbarTheme}>
+              <Layout1Topbar fixed={true} className="elevation-z8" />
+            </ThemeProvider>
+          )}
 
-            {settings.footer.show && !settings.footer.fixed && <Footer />}
-          </StyledScrollBar>
-        )}
+          {settings.perfectScrollbar && (
+            <StyledScrollBar>
+              {layout1Settings.topbar.show && !layout1Settings.topbar.fixed && (
+                <ThemeProvider theme={topbarTheme}>
+                  <Layout1Topbar />
+                </ThemeProvider>
+              )}
+              <Box flexGrow={1} position="relative">
+                <MatxSuspense>
+                  <Outlet />
+                </MatxSuspense>
+              </Box>
 
-        {!settings.perfectScrollbar && (
-          <ContentBox>
-            {layout1Settings.topbar.show && !layout1Settings.topbar.fixed && (
-              <ThemeProvider theme={topbarTheme}>
-                <Layout1Topbar />
-              </ThemeProvider>
-            )}
+              {settings.footer.show && !settings.footer.fixed && <Footer />}
+            </StyledScrollBar>
+          )}
 
-            <Box flexGrow={1} position="relative">
-              <MatxSuspense>
-                <Outlet />
-              </MatxSuspense>
-            </Box>
+          {!settings.perfectScrollbar && (
+            <ContentBox>
+              {layout1Settings.topbar.show && !layout1Settings.topbar.fixed && (
+                <ThemeProvider theme={topbarTheme}>
+                  <Layout1Topbar />
+                </ThemeProvider>
+              )}
 
-            {settings.footer.show && !settings.footer.fixed && <Footer />}
-          </ContentBox>
-        )}
+              <Box flexGrow={1} position="relative">
+                <MatxSuspense>
+                  <Outlet />
+                </MatxSuspense>
+              </Box>
 
-        {settings.footer.show && settings.footer.fixed && <Footer />}
-      </LayoutContainer>
-      {/* </Spin> */}
+              {settings.footer.show && !settings.footer.fixed && <Footer />}
+            </ContentBox>
+          )}
 
-      {settings.secondarySidebar.show && <SecondarySidebar />}
-    </Layout1Root>
+          {settings.footer.show && settings.footer.fixed && <Footer />}
+        </LayoutContainer>
+
+        {settings.secondarySidebar.show && <SecondarySidebar />}
+      </Layout1Root>
+    </Spin>
   );
 };
 

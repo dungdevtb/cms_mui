@@ -19,13 +19,14 @@ import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListPermission, actionDeletePermission, actionGetListAdmin } from "redux/manage/action";
+import { actionGetListAdmin, actionGetListRole } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
-import DialogCUPermission from "./DialogCUPermission";
 import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
+import DialogCUAdmin from "./DialogCUAdmin";
+import { actionLoginByToken } from "redux/home/action";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -54,16 +55,18 @@ const ManageAdmin = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listPermission, listAdmin } = useSelector(state => ({
-        listPermission: state.manageReducer.listPermission,
-        listAdmin: state.manageReducer.listAdmin
+    const { listAdmin, listRole, infoUser } = useSelector(state => ({
+        listAdmin: state.manageReducer.listAdmin,
+        listRole: state.manageReducer.listRole,
+        infoUser: state.homeReducer.infoUser
     }), shallowEqual)
 
-    console.log(listAdmin);
+    // console.log(infoUser, 'checkkkkk');
 
     useEffect(() => {
-        dispatch(actionGetListPermission())
         dispatch(actionGetListAdmin())
+        dispatch(actionGetListRole())
+        // dispatch(actionLoginByToken())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -91,7 +94,7 @@ const ManageAdmin = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPermission({ name: event.target.value }))
+        dispatch(actionGetListAdmin({ name: event.target.value }))
     }, 500)
 
     return (
@@ -174,7 +177,7 @@ const ManageAdmin = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={listPermission?.rows.length}
+                        count={listAdmin?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -184,10 +187,11 @@ const ManageAdmin = () => {
                 </Box>
 
                 {open &&
-                    <DialogCUPermission
+                    <DialogCUAdmin
                         open={open}
                         handleClose={handleClose}
                         record={record}
+                        dataRole={listRole?.rows}
                     />
                 }
             </SimpleCard>

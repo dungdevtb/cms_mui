@@ -59,7 +59,7 @@ const JwtLogin = () => {
 
   // const { login } = useAuth();
 
-  const handleFormSubmit = (values) => {
+  const handleFormSubmit = async (values) => {
     setLoading(true);
 
     const dataSubmit = {
@@ -71,8 +71,8 @@ const JwtLogin = () => {
       // await login(values.email, values.password);
       // navigate('/');
 
-      dispatch(actionLogin(dataSubmit));
-      navigate('/');
+      await dispatch(actionLogin(dataSubmit));
+      navigate('/dashboard');
     } catch (e) {
       message.error('Đăng nhập thất bại!');
       setLoading(false);

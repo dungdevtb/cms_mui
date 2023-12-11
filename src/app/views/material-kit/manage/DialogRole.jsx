@@ -3,7 +3,6 @@ import {
     Box, Button,
     Dialog, DialogActions,
     DialogContent, DialogTitle,
-    DialogContentText,
     styled, Grid
 } from '@mui/material';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";

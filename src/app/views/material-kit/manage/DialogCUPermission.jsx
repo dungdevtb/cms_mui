@@ -3,7 +3,6 @@ import {
     Box, Button,
     Dialog, DialogActions,
     DialogContent,
-    DialogContentText,
     styled, Grid,
     Typography, IconButton,
 } from '@mui/material';
@@ -103,9 +102,6 @@ function DialogCUPermission({ open, handleClose, record }) {
 
                 <ValidatorForm onSubmit={handleSubmit} >
                     <DialogContent dividers >
-                        {/* <DialogContentText>
-                            To subscribe to this website, please enter your email address here.
-                        </DialogContentText> */}
                         <Grid container spacing={6}>
                             <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <TextField

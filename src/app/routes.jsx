@@ -18,6 +18,8 @@ const AppEchart = Loadable(lazy(() => import('app/views/charts/echarts/AppEchart
 // dashboard page
 const Analytics = Loadable(lazy(() => import('app/views/dashboard/Analytics')));
 
+
+// const dispatch = useDispatch();
 const routes = [
   {
     element: (
@@ -27,14 +29,12 @@ const routes = [
     ),
     children: [
       ...materialRoutes,
-      // dashboard route
       {
-        path: '/dashboard/default',
+        path: '/dashboard',
         element: <Analytics />,
         auth: authRoles.admin
       },
 
-      // e-chart rooute
       {
         path: '/charts/echarts',
         element: <AppEchart />,
@@ -49,7 +49,7 @@ const routes = [
   { path: '/session/signup', element: <JwtRegister /> },
   { path: '/session/forgot-password', element: <ForgotPassword /> },
 
-  { path: '/', element: <Navigate to="dashboard/default" /> },
+  { path: '/', element: <Navigate to="dashboard" /> },
   { path: '*', element: <NotFound /> }
 ];
 

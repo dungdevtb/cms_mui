@@ -23,27 +23,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1)
 }));
 
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  console.log(reader, 'reader');
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-const beforeUpload = (file) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-  if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
-  }
-  return isJpgOrPng && isLt2M;
-};
 
 export default function AppButton() {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
 
   const dispatch = useDispatch();
   const [fileUpload, setFileUpload] = useState(null);
@@ -51,32 +33,7 @@ export default function AppButton() {
     'https://api.hanagold.vn/uploads/1640839689807-defaultUpload.png'
   );
 
-  const uploadButton = (
-    <div>
-      {loading ? <CircularProgress /> : <AddIcon />}
-      <div
-        style={{
-          marginTop: 8
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
 
-  const handleChange = (info) => {
-    if (info.file.status === 'uploading') {
-      setLoading(true);
-      return;
-    }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (url) => {
-        setLoading(false);
-        setImageUrl(url);
-      });
-    }
-  };
 
   const { dataProduct } = useSelector(
     (state) => ({
@@ -84,8 +41,6 @@ export default function AppButton() {
     }),
     shallowEqual
   );
-
-  // console.log(dataProduct, 'dataProduct');
 
   useEffect(() => {
     dispatch(actionGetListProduct());
@@ -121,9 +76,9 @@ export default function AppButton() {
     }
   };
 
-  console.log(fileUpload, 'imageUrl');
 
   const handleUpload = async () => {
+    setLoading(true);
     if (!fileUpload && !oldFileUpload) {
       return message.error('Vui lòng tải ảnh!');
     }
@@ -134,8 +89,10 @@ export default function AppButton() {
       image = await dispatch(actionUploadOneFile(newUploadFile));
     }
 
+    setLoading(false);
     console.log(image, 'image');
   };
+
 
   return (
     <AppButtonRoot>
@@ -200,7 +157,7 @@ export default function AppButton() {
           onChange={handleChange}
         >
           {imageUrl ? (
-            <img
+            <imgđ
               src={imageUrl}
               alt="avatar"
               style={{
@@ -212,13 +169,36 @@ export default function AppButton() {
           )}
         </Upload> */}
 
-        <Upload {...uploadProps}>
-          <img
+        <Upload
+          {...uploadProps}
+          listType="picture-card"
+        >
+          {/* <img
             src={fileUpload?.newImg || oldFileUpload}
             alt=""
             className="rad--4"
             style={{ objectFit: 'cover', width: '150px', height: '150px' }}
-          />
+          /> */}
+          {fileUpload ? (
+            <img
+              src={fileUpload?.newImg}
+              alt="avatar"
+              style={{
+                width: '100%'
+              }}
+            />
+          ) : (
+            <div>
+              {loading ? <CircularProgress /> : <AddIcon />}
+              <div
+                style={{
+                  marginTop: 8
+                }}
+              >
+                Upload
+              </div>
+            </div>
+          )}
         </Upload>
       </SimpleCard>
 

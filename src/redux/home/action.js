@@ -21,21 +21,51 @@ export const actionLogin = (payload) => async (dispatch, getState) => {
         const token = response?.data?.token || null
         localStorage.setItem('token', token)
 
-        let listPermissions = []
+        let listPermission = []
         if (response?.data?.list_permission.length > 0) {
             for (let item of response?.data?.list_permission) {
-                listPermissions = [...listPermissions, item.slug]
+                listPermission = [...listPermission, item.slug]
             }
         }
-
+        console.log(listPermission, response?.data?.user)
         await Promise.all([
             dispatch(actionSaveInfoUser(response?.data?.user)),
-            dispatch(actionSaveListUserLoginPermission(listPermissions)),
+            dispatch(actionSaveListUserLoginPermission(listPermission)),
         ])
+        return response?.data?.user
+    } catch (error) {
+        console.log(error)
+        alert(error || error?.message)
+    }
+}
+
+export const actionLoginByToken = () => async (dispatch) => {
+    try {
+        const response = await fetchApi('/login-by-token', 'get')
+
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+        const token = response?.data?.token || null
+        localStorage.setItem('token', token)
+        let listPermission = []
+
+        for (let item of response?.data?.list_permission) {
+            listPermission = [...listPermission, item.slug]
+        }
+
+        console.log(listPermission, 'checkkkkk');
+        await Promise.all([
+            dispatch(actionSaveInfoUser(response?.data?.user)),
+            dispatch(actionSaveListUserLoginPermission(listPermission)),
+        ])
+
         return response?.data?.user
     } catch (error) {
         alert(error || error?.message)
     }
+
 }
 
 export const actionLogout = () => async () => {
@@ -65,11 +95,11 @@ export const checkErrorCode = async (code, errorMessage) => {
             break;
         }
         case 401: {
-            message.error("Authen token is invalid!");
+            message.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
             break;
         }
         default:
-            message.error("Authen token is invalid!");
+            message.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
             break;
 
     }

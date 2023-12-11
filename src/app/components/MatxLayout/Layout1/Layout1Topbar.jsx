@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Hidden,
@@ -18,10 +18,13 @@ import { NotificationProvider } from 'app/contexts/NotificationContext';
 import useAuth from 'app/hooks/useAuth';
 import useSettings from 'app/hooks/useSettings';
 import { topBarHeight } from 'app/utils/constant';
+import { useDispatch } from 'react-redux';
 
 import { Span } from '../../Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import ShoppingCart from '../../ShoppingCart';
+import { actionLogout, actionSaveInfoUser } from 'redux/home/action';
+import { message } from 'antd';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary
@@ -87,6 +90,9 @@ const Layout1Topbar = () => {
   const { logout, user } = useAuth();
   const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const updateSidebarMode = (sidebarSettings) => {
     updateSettings({ layout1Settings: { leftSidebar: { ...sidebarSettings } } });
   };
@@ -101,6 +107,22 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
+
+
+  const handleLogout = async () => {
+    try {
+      if (window.confirm('Are you sure, you want to logout?')) {
+        // await Promise.all([
+        //   localStorage.removeItem("token"),
+        //   dispatch(actionSaveInfoUser(null)),
+        // ])
+        // navigate('/session/signin')
+        await dispatch(actionLogout())
+      }
+    } catch (e) {
+      message.error('Đăng xuất thất bại!', e)
+    }
+  }
 
   return (
     <TopbarRoot>
@@ -165,7 +187,7 @@ const Layout1Topbar = () => {
               <Span> Settings </Span>
             </StyledItem>
 
-            <StyledItem onClick={logout}>
+            <StyledItem onClick={handleLogout}>
               <Icon> power_settings_new </Icon>
               <Span> Logout </Span>
             </StyledItem>
