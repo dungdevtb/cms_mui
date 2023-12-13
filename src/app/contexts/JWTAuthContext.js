@@ -1,30 +1,13 @@
 import { createContext, useEffect, useReducer } from 'react';
 import axios from 'axios';
 import { MatxLoading } from 'app/components';
+import { useSelector, shallowEqual } from 'react-redux';
 
 const initialState = {
   user: null,
   isInitialised: false,
   isAuthenticated: false
 };
-
-// const isValidToken = (accessToken) => {
-//   if (!accessToken) return false;
-
-//   const decodedToken = jwtDecode(accessToken);
-//   const currentTime = Date.now() / 1000;
-//   return decodedToken.exp > currentTime;
-// };
-
-// const setSession = (accessToken) => {
-//   if (accessToken) {
-//     localStorage.setItem('accessToken', accessToken);
-//     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-//   } else {
-//     localStorage.removeItem('accessToken');
-//     delete axios.defaults.headers.common.Authorization;
-//   }
-// };
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -82,14 +65,18 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGOUT' });
   };
 
+  const { infoUser } = useSelector(state => ({
+    infoUser: state.homeReducer.infoUser,
+  }), shallowEqual)
+
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get('/api/auth/profile');
-        dispatch({ type: 'INIT', payload: { isAuthenticated: true, user: data.user } });
+        dispatch({ type: 'INIT', payload: { isAuthenticated: true, user: infoUser } });
       } catch (err) {
+        const { data } = await axios.get('/api/auth/profile');
         console.error(err);
-        dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null } });
+        dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: data.user } });
       }
     })();
   }, []);

@@ -27,7 +27,6 @@ export const actionLogin = (payload) => async (dispatch, getState) => {
                 listPermission = [...listPermission, item.slug]
             }
         }
-        console.log(listPermission, response?.data?.user)
         await Promise.all([
             dispatch(actionSaveInfoUser(response?.data?.user)),
             dispatch(actionSaveListUserLoginPermission(listPermission)),
@@ -55,7 +54,6 @@ export const actionLoginByToken = () => async (dispatch) => {
             listPermission = [...listPermission, item.slug]
         }
 
-        console.log(listPermission, 'checkkkkk');
         await Promise.all([
             dispatch(actionSaveInfoUser(response?.data?.user)),
             dispatch(actionSaveListUserLoginPermission(listPermission)),
@@ -65,7 +63,6 @@ export const actionLoginByToken = () => async (dispatch) => {
     } catch (error) {
         alert(error || error?.message)
     }
-
 }
 
 export const actionLogout = () => async () => {

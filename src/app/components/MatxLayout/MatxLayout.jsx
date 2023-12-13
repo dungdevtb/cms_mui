@@ -1,35 +1,32 @@
+import { useEffect } from 'react';
 import { MatxSuspense } from 'app/components';
 import useSettings from 'app/hooks/useSettings';
 import { MatxLayouts } from './index';
-import { redirect, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { useEffect } from 'react';
-import { actionLoginByToken } from 'redux/home/action';
+import { useNavigate } from 'react-router-dom';
+// import { useDispatch } from 'react-redux';
+// import { actionLoginByToken } from 'redux/home/action';
 
 const MatxLayout = (props) => {
   const { settings } = useSettings();
   const Layout = MatxLayouts[settings.activeLayout];
+  const token = localStorage.getItem('token');
 
   let navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { infoUser } = useSelector(state => ({
-    infoUser: state.homeReducer.infoUser,
-  }), shallowEqual)
+  // const dispatch = useDispatch();
 
-  const token = localStorage.getItem('token');
-  useEffect(() => {
-    (async () => {
-      if (token) {
-        await dispatch(actionLoginByToken());
-      }
-    })();
-  }, [dispatch])
+  // useEffect(() => {
+  //   (async () => {
+  //     if (token) {
+  //       await dispatch(actionLoginByToken());
+  //     }
+  //   })();
+  // }, [dispatch])
 
   useEffect(() => {
-    if (!token || !infoUser) {
+    if (!token) {
       navigate('/session/signin')
     }
-  }, [infoUser, token])
+  }, [token])
 
   return (
     <MatxSuspense>

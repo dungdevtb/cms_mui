@@ -254,4 +254,41 @@ export const actionGetListAdmin = (payload) => async (dispatch, getState) => {
     }
 }
 
+export const actionCUAdmin = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(actionLoading(true))
+        let response = await fetchApi('/api/user/update_user', 'post', payload)
+
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+
+        dispatch(actionGetListAdmin())
+        dispatch(actionLoading(false))
+        return response?.data
+    } catch (error) {
+        alert(error || error?.message)
+    }
+}
+
+export const actionDeleteAdmin = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(actionLoading(true))
+        const { id } = payload
+
+        let response = await fetchApi(`/api/user/delete_user/?id=${id}`, 'post')
+
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+
+        dispatch(actionGetListAdmin())
+        dispatch(actionLoading(false))
+        return response?.data
+    } catch (error) {
+        alert(error || error?.message)
+    }
+}
 

@@ -7,7 +7,8 @@ import {
     Typography, IconButton,
     CircularProgress,
     Select, MenuItem,
-    InputLabel
+    InputLabel, FormControlLabel,
+    Switch, FormControl
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,7 +16,8 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { message, Upload } from 'antd';
 import { useDispatch } from 'react-redux';
-import { actionCUPermission } from 'redux/manage/action';
+import { actionCUAdmin } from 'redux/manage/action';
+import { actionUploadOneFile } from 'redux/upload/action';
 
 const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
     margin: 0,
@@ -49,55 +51,85 @@ const TextField = styled(TextValidator)(() => ({
 
 function DialogCUAdmin({ open, handleClose, record, dataRole }) {
     const dispatch = useDispatch()
-    const [dataSubmit, setDataSubmit] = useState({})
+    const [dataSubmit, setDataSubmit] = useState({
+        username: '',
+        email: '',
+        address: '',
+        mobile: '',
+        role_id: 0,
+        status: false
+    })
     const [loading, setLoading] = useState(false);
 
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
-        'https://api.hanagold.vn/uploads/1640839689807-defaultUpload.png'
+        'https://toppng.com/uploads/preview/file-upload-image-icon-115632290507ftgixivqp.png'
     );
 
     useEffect(() => {
-        if (record) {
+        if (record && record.id) {
+            console.log('update');
             setDataSubmit({
                 ...dataSubmit,
-                name: record.username,
+                username: record.username,
                 email: record.email,
                 address: record.address,
-                role: record?.user_role?.role,
-                mobile: record.mobile
+                role_id: record?.user_role?.role?.id,
+                mobile: record.mobile,
+                status: record?.status === 1 ? true : false
             })
             setOldFileUpload(record?.avatar)
         }
     }, [])
 
-    console.log(oldFileUpload);
+    const handleChange = async (e) => {
+        // e.persist();
+        const { name, value, checked, type } = e.target;
 
-
-    const handleChange = (event) => {
-        event.persist();
         if (record && record.id) {
-            setDataSubmit({
-                ...dataSubmit,
+            setDataSubmit((prevData) => ({
+                ...prevData,
+                // [name]: type === 'checkbox' ? checked : value
                 id: record.id,
-                name: event.target.value,
-            })
+                [name]: value,
+                status: checked === true ? 1 : 0
+            }));
         } else {
-            setDataSubmit({
-                ...dataSubmit,
-                name: event.target.value,
-            });
+            setDataSubmit((prevData) => ({
+                ...prevData,
+                // [name]: type === 'checkbox' ? checked : value
+                [name]: value,
+                status: checked === true ? 1 : 0
+            }));
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         let messageSuccess = "Thêm mới thành công!"
 
         if (record && record.id) {
             messageSuccess = "Cập nhật thành công!"
         }
 
-        dispatch(actionCUPermission(dataSubmit));
+        setLoading(true);
+        if (!fileUpload && !oldFileUpload) {
+            return message.error('Vui lòng tải ảnh!');
+        }
+        let avatar = '';
+        if (fileUpload) {
+            let newUploadFile = new FormData();
+            newUploadFile.append('file', fileUpload);
+            avatar = await dispatch(actionUploadOneFile(newUploadFile));
+        }
+        setLoading(false);
+
+        let dataPayload = {
+            ...dataSubmit,
+            avatar: fileUpload ? avatar : oldFileUpload,
+        }
+
+        dispatch(actionCUAdmin(dataPayload));
         handleClose();
         return message.success(messageSuccess);
     };
@@ -151,23 +183,24 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
                         <Grid container spacing={6}>
                             <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <InputLabel id="demo-simple-label">Ảnh đại diện</InputLabel>
-
                                 <Upload
                                     {...uploadProps}
-                                    listType="picture-card"
+                                // onChange={handleChange}
+                                // listType="picture-card"
                                 >
-                                    {/* <img
+                                    <img
                                         src={fileUpload?.newImg || oldFileUpload}
                                         alt=""
                                         className="rad--4"
                                         style={{ objectFit: 'cover', width: '150px', height: '150px' }}
-                                    /> */}
-                                    {fileUpload || oldFileUpload ? (
+                                    />
+                                    {/* {fileUpload || oldFileUpload ? (
                                         <img
                                             src={fileUpload?.newImg || oldFileUpload}
                                             alt="avatar"
                                             style={{
-                                                width: '100%'
+                                                width: '100%',
+                                                marginBottom: 16
                                             }}
                                         />
                                     ) : (
@@ -175,71 +208,88 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
                                             {loading ? <CircularProgress /> : <AddIcon />}
                                             <div
                                                 style={{
-                                                    marginTop: 8
+                                                    marginTop: 8,
+                                                    marginBottom: 16
                                                 }}
                                             >
                                                 Upload
                                             </div>
                                         </div>
-                                    )}
+                                    )} */}
                                 </Upload>
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
                                 <TextField
                                     type="text"
-                                    name="name"
+                                    name="username"
                                     label="Tên admin"
-                                    // placeholder='Tên admin'
+                                    value={dataSubmit.username || ""}
                                     onChange={handleChange}
-                                    value={dataSubmit.name || ""}
                                     validators={["required"]}
                                     errorMessages={["Vui lòng nhập tên admin!"]}
-                                    style={{ width: '100%' }}
+                                    fullWidth
                                 />
 
                                 <TextField
-                                    type="text"
-                                    name="Email"
+                                    type="password"
+                                    name="password"
+                                    label="Mật khẩu"
+                                    onChange={handleChange}
+                                    value={dataSubmit.password || ""}
+                                    fullWidth
+                                />
+
+                                <TextField
+                                    type="email"
+                                    name="email"
                                     label="Email"
-                                    disabled={true}
+                                    onChange={handleChange}
                                     value={dataSubmit.email || ""}
                                     validators={["required"]}
                                     errorMessages={["Vui lòng nhập email admin!"]}
-                                    style={{ width: '100%' }}
+                                    fullWidth
                                 />
 
                                 <TextField
                                     type="text"
                                     name="address"
                                     label="Địa chỉ"
-                                    disabled={true}
+                                    onChange={handleChange}
                                     value={dataSubmit.address || ""}
-                                    style={{ width: '100%' }}
+                                    fullWidth
                                 />
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="demo-simple-select-label">Vai trò</InputLabel>
-                                <Select
-                                    name="role"
-                                    labelId="demo-simple-select-label"
-                                    label="Vai trò"
-                                    // onChange={handleChange}
-                                    // value={dataSubmit.role || ""}
-                                    value={"abcccccccccc"}
-                                    validators={["required"]}
-                                    errorMessages={["Vui lòng nhập vai trò admin!"]}
-                                    style={{ width: '100%', marginBottom: 16 }}
-                                >
-                                    {dataRole?.map((item, index) => (
-                                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
-                                    ))}
-                                </Select>
+                                <InputLabel id="demo-simple-switch-label">Trạng thái người dùng</InputLabel>
+                                <FormControlLabel
+                                    control={<Switch checked={dataSubmit.status} onChange={handleChange} name='status' />}
+                                    label={dataSubmit.status ? "Hoạt động" : "Không hoạt động"}
+                                    style={{ marginBottom: 12 }}
+                                />
+
+                                <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Vai trò</InputLabel>
+                                    <Select
+                                        name="role_id"
+                                        labelId="demo-simple-select-label"
+                                        label="Vai trò"
+                                        onChange={handleChange}
+                                        value={dataSubmit.role_id || ""}
+                                        validators={["required"]}
+                                        errorMessages={["Vui lòng nhập vai trò admin!"]}
+                                        style={{ width: '100%', marginBottom: 16 }}
+                                    >
+                                        {dataRole?.map((item, index) => (
+                                            <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
                                 <TextField
-                                    type="text"
+                                    type="number"
                                     name="mobile"
                                     label="Số điện thoại"
-                                    disabled={true}
+                                    onChange={handleChange}
                                     value={dataSubmit.mobile || ""}
                                     style={{ width: '100%' }}
                                 />
@@ -259,7 +309,7 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
                     </DialogActions>
                 </ValidatorForm>
             </Dialog>
-        </Box>
+        </Box >
     );
 }
 

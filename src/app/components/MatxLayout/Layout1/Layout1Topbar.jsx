@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { memo, useEffect } from 'react';
+import { Link, } from 'react-router-dom';
 import {
   Avatar,
   Hidden,
@@ -18,13 +18,14 @@ import { NotificationProvider } from 'app/contexts/NotificationContext';
 import useAuth from 'app/hooks/useAuth';
 import useSettings from 'app/hooks/useSettings';
 import { topBarHeight } from 'app/utils/constant';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 
 import { Span } from '../../Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import ShoppingCart from '../../ShoppingCart';
-import { actionLogout, actionSaveInfoUser } from 'redux/home/action';
+import { actionLogout } from 'redux/home/action';
 import { message } from 'antd';
+import { actionLoginByToken } from 'redux/home/action';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary
@@ -91,11 +92,25 @@ const Layout1Topbar = () => {
   const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const updateSidebarMode = (sidebarSettings) => {
     updateSettings({ layout1Settings: { leftSidebar: { ...sidebarSettings } } });
   };
+
+  const { infoUser } = useSelector(state => ({
+    infoUser: state.homeReducer.infoUser,
+  }), shallowEqual)
+
+  const token = localStorage.getItem('token');
+  useEffect(() => {
+    (async () => {
+      if (token) {
+        await dispatch(actionLoginByToken());
+      }
+    })();
+  }, [dispatch])
+
+  console.log();
 
   const handleSidebarToggle = () => {
     let { layout1Settings } = settings;
@@ -161,10 +176,10 @@ const Layout1Topbar = () => {
               <UserMenu>
                 <Hidden xsDown>
                   <Span>
-                    Hi <strong>{user.name}</strong>
+                    Hi <strong>{infoUser?.username}</strong>
                   </Span>
                 </Hidden>
-                <Avatar src={user.avatar} sx={{ cursor: 'pointer' }} />
+                <Avatar src={infoUser?.avatar} sx={{ cursor: 'pointer' }} />
               </UserMenu>
             }
           >

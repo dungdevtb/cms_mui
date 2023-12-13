@@ -19,14 +19,14 @@ import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListAdmin, actionGetListRole } from "redux/manage/action";
+import { actionGetListAdmin, actionGetListRole, actionDeleteAdmin } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
 import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
 import DialogCUAdmin from "./DialogCUAdmin";
-import { actionLoginByToken } from "redux/home/action";
+import { actionLoading } from "redux/home/action";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -55,18 +55,14 @@ const ManageAdmin = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listAdmin, listRole, infoUser } = useSelector(state => ({
+    const { listAdmin, listRole } = useSelector(state => ({
         listAdmin: state.manageReducer.listAdmin,
         listRole: state.manageReducer.listRole,
-        infoUser: state.homeReducer.infoUser
     }), shallowEqual)
-
-    // console.log(infoUser, 'checkkkkk');
 
     useEffect(() => {
         dispatch(actionGetListAdmin())
         dispatch(actionGetListRole())
-        // dispatch(actionLoginByToken())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -94,8 +90,29 @@ const ManageAdmin = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListAdmin({ name: event.target.value }))
+        const { name, value } = event.target
+        dispatch(actionGetListAdmin({
+            [name]: value,
+        }))
     }, 500)
+
+    const handleDelete = (id) => {
+        if (window.confirm("Bạn có muốn xóa?")) {
+            const res = dispatch(actionDeleteAdmin({ id }));
+            if (res) {
+                message.success("Xóa thành công!");
+            }
+        }
+    }
+
+    const handleExportExcel = async () => {
+        dispatch(actionLoading(true))
+        const url = new URL(`${process.env.REACT_APP_API_URL}/api/exportExcel/list-user`)
+        const accessToken = localStorage.getItem('token')
+        url.searchParams.append('token', accessToken)
+        window.open(url)
+        dispatch(actionLoading(false))
+    }
 
     return (
         <Container>
@@ -106,24 +123,47 @@ const ManageAdmin = () => {
                 <div >
                     <Box width="100%" marginBottom="36px">Danh sách admin</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                        <TextField
-                            type="text"
-                            name="name"
-                            label="Tìm kiếm theo tên"
-                            onChange={handleChangeSearchDelay}
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchOutlinedIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <Box>
+                            <TextField
+                                type="text"
+                                name="name"
+                                label="Tìm kiếm theo tên"
+                                onChange={handleChangeSearchDelay}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                style={{ marginRight: '15px' }}
+                            />
 
-                        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                            Thêm mới
-                        </Button>
+                            <TextField
+                                type="email"
+                                name="email"
+                                label="Tìm kiếm theo email"
+                                onChange={handleChangeSearchDelay}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <Button variant="outlined" color="success" onClick={handleExportExcel} style={{ marginRight: 15 }}>
+                                Export Excel
+                            </Button>
+                            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                                Thêm mới
+                            </Button>
+                        </Box>
                     </Box>
                 </div>
             } >
@@ -164,6 +204,11 @@ const ManageAdmin = () => {
                                                     <Icon color="primary" onClick={() => handleClickOpen(item)}>
                                                         <BorderColorOutlinedIcon />
                                                     </Icon>
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Xóa">
+                                                <IconButton onClick={() => handleDelete(item?.id)}>
+                                                    <Icon color="error">close</Icon>
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>
