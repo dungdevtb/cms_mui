@@ -20,6 +20,62 @@ export const navigations = [
       { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
     ]
   },
+  {
+    name: 'Quản lý tin tức',
+    icon: 'desktop_mac',
+    children: [
+      { name: 'Danh sách bài viết', iconText: 'SI', path: '/content/list' },
+      { name: 'Danh sách nhãn', iconText: 'SU', path: '/tag/list' },
+      { name: 'Danh mục bài viết', iconText: 'FP', path: '/content/category' },
+      { name: 'Danh sách video', iconText: 'FP', path: '/news/video' },
+    ]
+  },
+  {
+    name: 'Quản lý đơn hàng',
+    icon: 'shop',
+    children: [
+      { name: 'Danh sách đơn hàng', iconText: 'SI', path: '/order/list' },
+      { name: 'Danh sách voucher', iconText: 'SU', path: '/voucher/list' },
+      { name: 'Danh sách quà tặng cho khách hàng', iconText: 'FP', path: '/voucher/gift-to-user' },
+    ]
+  },
+  {
+    name: 'Quản lý kho hàng',
+    icon: 'shopping_cart',
+    children: [
+      { name: 'Danh sách sản phẩm', iconText: 'SI', path: '/product/list' },
+      { name: 'Danh sách brand', iconText: 'FG', path: '/product/brand' },
+      { name: 'Quản lý danh mục', iconText: 'SU', path: '/product/category' },
+      // { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
+    ]
+  },
+  {
+    name: 'Quản lý dự án',
+    icon: 'subtitles',
+    children: [
+      { name: 'Quản lý admin', iconText: 'SI', path: '/admin/manage' },
+      { name: 'Quản lý vai trò', iconText: 'SU', path: '/admin/role' },
+      { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
+    ]
+  },
+  {
+    name: 'Quản lý khách hàng',
+    icon: 'person',
+    children: [
+      { name: 'Danh sách khách hàng', iconText: 'SI', path: '/admin/manage' },
+      { name: 'Quản lý vai trò', iconText: 'SU', path: '/admin/role' },
+      { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
+    ]
+  },
+  {
+    name: 'Quản lý giao dịch',
+    icon: 'monetization_on',
+    children: [
+      { name: 'Danh sách nhập hàng', iconText: 'SI', path: '/admin/manage' },
+      { name: 'Danh sách bán hàng', iconText: 'SU', path: '/admin/role' },
+      { name: 'Top bán chạy', iconText: 'FP', path: '/admin/permission' },
+    ]
+  },
 
   { label: 'Components', type: 'label' },
   {

@@ -63,7 +63,7 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
 
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
-        'https://toppng.com/uploads/preview/file-upload-image-icon-115632290507ftgixivqp.png'
+        '/assets/images/imageDefault.png'
     );
 
     useEffect(() => {
@@ -180,7 +180,7 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
 
                 <ValidatorForm onSubmit={handleSubmit} >
                     <DialogContent dividers >
-                        <Grid container spacing={6}>
+                        <Grid container spacing={4}>
                             <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <InputLabel id="demo-simple-label">Ảnh đại diện</InputLabel>
                                 <Upload

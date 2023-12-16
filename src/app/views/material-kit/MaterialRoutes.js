@@ -1,5 +1,7 @@
 import { lazy } from 'react';
 import Loadable from 'app/components/Loadable';
+import ManageProduct from './product/ManageProduct';
+import ManageCategory from './product/MannageCategory';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -41,6 +43,11 @@ const materialRoutes = [
   { path: '/admin/manage', element: <ManageAdmin /> },
   { path: '/admin/role', element: <ManageRole /> },
   { path: '/admin/permission', element: <ManagePermission /> },
+
+  //product
+  //manage
+  { path: '/product/list', element: <ManageProduct /> },
+  { path: '/product/category', element: <ManageCategory /> },
 
 ];
 

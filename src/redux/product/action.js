@@ -6,7 +6,7 @@ export const actionGetListProduct = (payload) => async (dispatch, getState) => {
   try {
     dispatch(dispatch(actionLoading(true)));
     // const { page } = payload
-    let response = await fetchApi('/api/tutorial/get_all_tutorials', 'get', payload);
+    let response = await fetchApi('/api/product/get_all_products', 'get', payload);
 
     if (response.statusCode !== 200) {
       dispatch(dispatch(actionLoading(false)));

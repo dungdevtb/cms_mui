@@ -216,3 +216,14 @@ export const checkNoImg = (name, image) => {
 export const formatMoneyNormal = (text) => {
     return text.toLocaleString()
 }
+
+// export const formatMoney = (num) => {
+//     if (!num || num === "") return "0";
+//     let numberMoney = Number(num)
+//       .toFixed(0)
+//       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+//     numberMoney = (numberMoney + "").replace(/,/g, "*");
+//     numberMoney = numberMoney.replace(/\./g, ",");
+//     numberMoney = numberMoney.replace(/\*/g, ".");
+//     return numberMoney;
+//   };
