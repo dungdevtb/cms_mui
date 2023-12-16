@@ -152,12 +152,36 @@ function DialogCUProduct({ open, handleClose, record }) {
             new_array[index].name = event;
             setColors(new_array);
         }
-        if (key === "size") {
-            let new_array = [...sizes];
-            console.log(event, 'event', new_array[index]);
-            new_array[index].size = event;
-            setSizes(new_array);
-        }
+        // if (key === "size") {
+        //     let new_array = [...sizes];
+        //     console.log(event, 'event', new_array[index]);
+        //     new_array[index].size = event;
+
+        //     // new_array[index].quantity = event;
+
+        //     setSizes(new_array);
+        // }
+    }
+
+    const handleChangeSize = (event, index, key, indexColor) => {
+        let new_array = [...sizes];
+        console.log(event, 'event', new_array[index]);
+        console.log(indexColor, 'indexColor', index);
+        new_array[index][key] = event;
+
+        new_array[index].colors = colors.map((item, i) => {
+            if (i === indexColor) {
+                return {
+                    ...item,
+                    quantity: event
+                }
+            }
+            return item
+        })
+
+        // new_array[index].quantity = event;
+
+        setSizes(new_array);
     }
 
     const handleAddColor = () => {
@@ -184,7 +208,7 @@ function DialogCUProduct({ open, handleClose, record }) {
         setSizes(new_arr_sub)
     }
 
-    console.log(colors, 'colors');
+    console.log(sizes, 'sizes');
 
     return (
         <Box>
@@ -287,7 +311,7 @@ function DialogCUProduct({ open, handleClose, record }) {
                                                     type="text"
                                                     value={val?.size || ""}
                                                     size="small"
-                                                    onChange={(e) => handleChangeAttributes(e.target.value, index, "size")}
+                                                    onChange={(e) => handleChangeSize(e.target.value, index, "size")}
                                                 />
                                             </Grid>
                                             <Grid item xs={7} sm={7} md={7} sx={{ mr: 2 }}>
@@ -314,9 +338,9 @@ function DialogCUProduct({ open, handleClose, record }) {
                                                         <TextField
                                                             type="number"
                                                             label="Số lượng"
-                                                            value={valColor?.quantity || ""}
+                                                            // value={valColor?.quantity || ""}
                                                             size="small"
-                                                            onChange={(e) => handleChangeAttributes(e.target.value, index, "size")}
+                                                            onChange={(e) => handleChangeSize(e.target.value, index, "quantity", indexColor)}
                                                         />
                                                     </Box>
                                                 ))}
