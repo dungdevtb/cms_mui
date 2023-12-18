@@ -8,6 +8,10 @@ const initialState = {
   dataCategory: {
     rows: [],
     paging: {}
+  },
+  dataBrand: {
+    rows: [],
+    paging: {}
   }
 };
 
@@ -23,6 +27,11 @@ const reducer = (state = initialState, action) => {
         ...state,
         dataCategory: action.payload
       };
+    case Types.SAVE_LIST_BRAND:
+      return {
+        ...state,
+        dataBrand: action.payload
+      }
     default:
       return state;
   }

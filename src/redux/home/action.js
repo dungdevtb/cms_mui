@@ -75,6 +75,22 @@ export const actionLogout = () => async () => {
     }
 }
 
+export const actionRegister = (payload) => async (dispatch, getState) => {
+    try {
+        const response = await fetchApi('/register', 'post', payload)
+
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+
+        return response?.data
+    } catch (error) {
+        console.log(error)
+        alert(error || error?.message)
+    }
+}
+
 export const actionSaveInfoUser = (payload) => ({
     type: Types.SAVE_INFO_USER,
     payload,

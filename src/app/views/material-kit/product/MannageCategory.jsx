@@ -17,13 +17,13 @@ import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
+import { actionGetListCategory, actionDeleteCategory } from "redux/product/action";
 import { SimpleCard, Breadcrumb } from "app/components";
 import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
-// import DialogCUPermission from "./DialogCUPermission";
+import DialogCategory from "./DialogCategory";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -52,12 +52,12 @@ const ManageCategory = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listPermission } = useSelector(state => ({
-        listPermission: state.manageReducer.listPermission,
+    const { dataCategory } = useSelector(state => ({
+        dataCategory: state.productReducer.dataCategory
     }), shallowEqual)
 
     useEffect(() => {
-        dispatch(actionGetListPermission())
+        dispatch(actionGetListCategory())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -76,7 +76,7 @@ const ManageCategory = () => {
 
     const handleDelete = (id) => {
         if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePermission({ id }));
+            const res = dispatch(actionDeleteCategory({ id }));
             if (res) {
                 message.success("Xóa thành công!");
             }
@@ -94,7 +94,7 @@ const ManageCategory = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPermission({ name: event.target.value }))
+        dispatch(actionGetListCategory({ name: event.target.value }))
     }, 500)
 
     return (
@@ -133,20 +133,20 @@ const ManageCategory = () => {
                             <TableRow>
                                 <TableCell align="center">Stt</TableCell>
                                 <TableCell align="center">Tên danh mục</TableCell>
-                                <TableCell align="center">Slug</TableCell>
+                                <TableCell align="center">Mô tả</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {listPermission?.rows.length > 0
-                                && listPermission?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                            {dataCategory?.rows.length > 0
+                                && dataCategory?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
                                         </TableCell>
                                         <TableCell align="center">{item.name}</TableCell>
-                                        <TableCell align="center">{item.slug}</TableCell>
+                                        <TableCell align="center">{item.description}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title="Sửa">
                                                 <IconButton>
@@ -171,7 +171,7 @@ const ManageCategory = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={listPermission?.rows.length}
+                        count={dataCategory?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -180,13 +180,13 @@ const ManageCategory = () => {
                     />
                 </Box>
 
-                {/* {open &&
-                    <DialogCUPermission
+                {open &&
+                    <DialogCategory
                         open={open}
                         handleClose={handleClose}
                         record={record}
                     />
-                } */}
+                }
             </SimpleCard>
         </Container>
     );

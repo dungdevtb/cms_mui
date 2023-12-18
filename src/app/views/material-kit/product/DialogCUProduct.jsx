@@ -1,18 +1,20 @@
+/* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react';
 import {
     Box, Button,
     Dialog, DialogActions,
     DialogContent, DialogTitle,
     styled, Grid,
-    InputLabel
+    InputLabel, Select,
+    MenuItem, Switch,
+    FormControlLabel
 } from '@mui/material';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import { convertToSlug } from 'app/lib/common';
-import { actionCURole } from 'redux/manage/action';
-import { Input, message, Upload } from 'antd';
-import { useDispatch } from 'react-redux';
+import { message, Upload } from 'antd';
 import { actionUploadOneFile } from 'redux/upload/action';
-
+import { actionGetListCategory, actionGetListBrand, actionCUProduct } from 'redux/product/action';
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import _ from 'lodash'
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -21,48 +23,77 @@ const TextField = styled(TextValidator)(() => ({
 
 function DialogCUProduct({ open, handleClose, record }) {
     const dispatch = useDispatch()
-    const [dataSubmit, setDataSubmit] = useState({})
+    const [dataSubmit, setDataSubmit] = useState({
+        status: false
+    })
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
         '/assets/images/imageDefault.png'
     );
 
     const [colors, setColors] = useState([])
-
     const [sizes, setSizes] = useState([])
+    const [newColor, setNewColor] = useState([])
+
+    const { dataBrand, dataCategory } = useSelector(
+        (state) => ({
+            dataBrand: state.productReducer.dataBrand,
+            dataCategory: state.productReducer.dataCategory
+        }),
+        shallowEqual
+    );
 
     useEffect(() => {
-        if (record) {
+        dispatch(actionGetListCategory());
+        dispatch(actionGetListBrand());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (record && record?.id) {
             setDataSubmit({
                 ...dataSubmit,
-                name: record.name,
-                slug: record.slug
+                name: record?.name,
+                description: record?.description,
+                quantity: record?.quantity,
+                import_price: record?.import_price,
+                sell_price: record?.sell_price,
+                category_id: record?.category?.id,
+                brand_id: record?.brand?.id,
+                status: record?.status === 1 ? true : false
             })
+
+            setColors(record?.color)
+            setSizes(record?.size_quantity)
+            setOldFileUpload(record?.image)
         }
     }, [])
 
     const handleChange = (event) => {
-        event.persist();
-        if (record && record.id) {
-            setDataSubmit({
-                ...dataSubmit,
-                id: record.id,
-                name: event.target.value,
-                slug: convertToSlug(event.target.value)
-            })
+        // event.persist();
+        const { name, value, checked, type } = event.target;
+
+        if (record && record?.id) {
+            setDataSubmit((prevData) => ({
+                ...prevData,
+                // [name]: type === 'checkbox' ? checked : value
+                id: record?.id,
+                [name]: value,
+                status: checked === true ? 1 : 0
+            }));
         } else {
-            setDataSubmit({
-                ...dataSubmit,
-                name: event.target.value,
-                slug: convertToSlug(event.target.value)
-            });
+            setDataSubmit((prevData) => ({
+                ...prevData,
+                // [name]: type === 'checkbox' ? checked : value
+                [name]: value,
+                status: checked === true ? 1 : 0
+            }));
         }
     };
 
     const handleSubmit = async () => {
         let messageSuccess = "Thêm mới thành công!"
 
-        if (record && record.id) {
+        if (record && record?.id) {
             messageSuccess = "Cập nhật thành công!"
         }
 
@@ -78,10 +109,14 @@ function DialogCUProduct({ open, handleClose, record }) {
 
         let dataPayload = {
             ...dataSubmit,
-            avatar: fileUpload ? image : oldFileUpload,
+            image: fileUpload ? image : oldFileUpload,
+            color: colors,
+            size_quantity: sizes,
+            quantity: handleTotalQuantity()
         }
 
-        dispatch(actionCURole(dataSubmit));
+        console.log(dataPayload, 'dataPayload');
+        dispatch(actionCUProduct(dataSubmit));
         handleClose();
         return message.success(messageSuccess);
     };
@@ -152,37 +187,40 @@ function DialogCUProduct({ open, handleClose, record }) {
             new_array[index].name = event;
             setColors(new_array);
         }
-        // if (key === "size") {
-        //     let new_array = [...sizes];
-        //     console.log(event, 'event', new_array[index]);
-        //     new_array[index].size = event;
-
-        //     // new_array[index].quantity = event;
-
-        //     setSizes(new_array);
-        // }
     }
 
     const handleChangeSize = (event, index, key, indexColor) => {
-        let new_array = [...sizes];
-        console.log(event, 'event', new_array[index]);
-        console.log(indexColor, 'indexColor', index);
-        new_array[index][key] = event;
-
-        new_array[index].colors = colors.map((item, i) => {
-            if (i === indexColor) {
-                return {
-                    ...item,
-                    quantity: event
-                }
-            }
-            return item
-        })
-
-        // new_array[index].quantity = event;
-
-        setSizes(new_array);
+        if (key === "size") {
+            let new_array = [...sizes];
+            new_array[index].size = event;
+            new_array[index].colors = colors
+            setSizes(new_array);
+        }
     }
+
+    const handleChangeQuantity = _.debounce((event, sizeIndex, colorIndex) => {
+        const newSizes = sizes.map((size, i) => {
+            if (i === sizeIndex) {
+                const newColors = size.colors.map((color, j) => {
+                    if (j === colorIndex) {
+                        return {
+                            ...color,
+                            quantity: event
+                        };
+                    }
+                    return color;
+                });
+                return {
+                    ...size,
+                    colors: newColors
+                };
+            }
+            return size;
+        });
+
+        setSizes(newSizes);
+    }, 100);
+
 
     const handleAddColor = () => {
         let new_arr_sub = [...colors];
@@ -208,13 +246,24 @@ function DialogCUProduct({ open, handleClose, record }) {
         setSizes(new_arr_sub)
     }
 
-    console.log(sizes, 'sizes');
+    const handleTotalQuantity = (data = sizes) => {
+        let totalQuantity = 0;
+
+        data?.forEach((size) => {
+            size.colors?.forEach((color) => {
+                totalQuantity += parseInt(color.quantity, 10) || 0;
+            });
+        });
+
+        return totalQuantity;
+    };
+
 
     return (
         <Box>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth='md'>
                 <DialogTitle id="form-dialog-title">
-                    {record && record.id ? "Cập nhật" : "Thêm mới"}
+                    {record && record?.id ? "Cập nhật" : "Thêm mới"}
                 </DialogTitle>
 
                 <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -237,26 +286,72 @@ function DialogCUProduct({ open, handleClose, record }) {
                                     name="name"
                                     label="Tên sản phẩm"
                                     onChange={handleChange}
-                                    value={dataSubmit.name || ""}
-                                    validators={["required"]}
-                                    errorMessages={["Vui lòng nhập tên sản phẩm!"]}
+                                    value={dataSubmit?.name || ""}
+                                    // validators={["required"]}
+                                    // errorMessages={["Vui lòng nhập tên sản phẩm!"]}
                                     size="small"
                                 />
-
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
                                 <TextField
                                     type="text"
-                                    name="slug"
-                                    label="Slug"
-                                    disabled={true}
-                                    value={dataSubmit.slug || ""}
+                                    name="import_price"
+                                    label="Giá nhập"
+                                    value={dataSubmit?.import_price || ""}
+                                    onChange={handleChange}
                                     size="small"
-
                                 />
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <TextField
+                                    type="text"
+                                    name="sell_price"
+                                    label="Giá bán"
+                                    value={dataSubmit?.sell_price || ""}
+                                    onChange={handleChange}
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <InputLabel id="demo-simple-select-label">Nhãn hàng</InputLabel>
+                                <Select
+                                    name="brand_id"
+                                    labelId="demo-simple-select-label"
+                                    // label="Nhãn hàng"
+                                    onChange={handleChange}
+                                    value={dataSubmit?.brand_id || ""}
+                                    validators={["required"]}
+                                    errorMessages={["Vui lòng nhập nhãn hàng!"]}
+                                    style={{ width: '100%', marginBottom: 16 }}
+                                    size="small"
+                                >
+                                    {dataBrand?.rows?.map((item, index) => (
+                                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <InputLabel id="demo-simple-select-label">Danh mục</InputLabel>
+                                <Select
+                                    name="category_id"
+                                    labelId="demo-simple-select-label"
+                                    // label="Danh mục"
+                                    onChange={handleChange}
+                                    value={dataSubmit?.category_id || ""}
+                                    validators={["required"]}
+                                    errorMessages={["Vui lòng nhập danh mục!"]}
+                                    style={{ width: '100%', marginBottom: 16 }}
+                                    size="small"
+                                >
+                                    {dataCategory?.rows?.map((item, index) => (
+                                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                                    ))}
+                                </Select>
                             </Grid>
 
                             <Grid item lg={12} md={12} sm={12} xs={12} >
                                 <InputLabel id="demo-simple-label">Màu sắc :</InputLabel>
-                                {colors.map((val, index) => (
+                                {colors?.map((val, index) => (
                                     <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2, ml: 8 }}>
                                         <Box key={index} display={'flex'} width={'100%'} >
                                             <Grid item xs={2} sm={2} md={2} >
@@ -302,7 +397,7 @@ function DialogCUProduct({ open, handleClose, record }) {
 
                             <Grid item lg={12} md={12} sm={12} xs={12} >
                                 <InputLabel id="demo-simple-label">Kích cỡ :</InputLabel>
-                                {sizes.map((val, index) => (
+                                {sizes?.map((val, index) => (
                                     <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2, ml: 8 }}>
                                         <Box key={index} display={'flex'} width={'100%'} >
                                             <Grid item xs={1} sm={1} md={1} sx={{ mr: 2 }}>
@@ -315,11 +410,12 @@ function DialogCUProduct({ open, handleClose, record }) {
                                                 />
                                             </Grid>
                                             <Grid item xs={7} sm={7} md={7} sx={{ mr: 2 }}>
-                                                {colors?.map((valColor, indexColor) => (
+                                                {(val?.colors || colors)?.map((valColor, indexColor) => (
                                                     <Box key={indexColor} display={'flex'} alignItems={'center'} width={'100%'} marginBottom={"15px"}>
                                                         <TextField
                                                             type="text"
                                                             label="Màu sắc"
+                                                            // disabled={true}
                                                             value={valColor?.name || ""}
                                                             size="small"
                                                         />
@@ -338,9 +434,9 @@ function DialogCUProduct({ open, handleClose, record }) {
                                                         <TextField
                                                             type="number"
                                                             label="Số lượng"
-                                                            // value={valColor?.quantity || ""}
+                                                            value={valColor?.quantity || ""}
                                                             size="small"
-                                                            onChange={(e) => handleChangeSize(e.target.value, index, "quantity", indexColor)}
+                                                            onChange={(e) => handleChangeQuantity(e.target.value, index, indexColor)}
                                                         />
                                                     </Box>
                                                 ))}
@@ -354,6 +450,34 @@ function DialogCUProduct({ open, handleClose, record }) {
                                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2, ml: 8 }}>
                                     <span onClick={handleAddSize}> + Thêm kích cỡ và số lượng </span>
                                 </Grid>
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <InputLabel id="demo-simple-label">Tổng số lượng</InputLabel>
+                                <TextField
+                                    type="number"
+                                    value={dataSubmit?.quantity || handleTotalQuantity()}
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <InputLabel id="demo-simple-switch-label">Trạng thái sản phẩm</InputLabel>
+                                <FormControlLabel
+                                    control={<Switch checked={dataSubmit?.status} onChange={handleChange} name='status' />}
+                                    label={dataSubmit?.status ? "Công bố" : "Không công bố"}
+                                    style={{ marginBottom: 12 }}
+                                />
+                            </Grid>
+                            <Grid item lg={12} md={12} sm={12} xs={12}>
+                                <TextField
+                                    type="text"
+                                    name="description"
+                                    label="Mô tả sản phẩm"
+                                    value={dataSubmit?.description || ""}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    multiLine={true}
+                                    minRows={4}
+                                />
                             </Grid>
                         </Grid>
                     </DialogContent>

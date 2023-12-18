@@ -20,14 +20,13 @@ import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
 import Button from '@mui/material/Button';
-import { message, Badge } from "antd";
+import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
 import DialogCUProduct from "./DialogCUProduct";
-import { actionGetListProduct } from 'redux/product/action';
+import { actionGetListProduct, actionDeleteProduct } from 'redux/product/action';
 import { formatMoney } from "app/lib/common";
 
 const Container = styled("div")(({ theme }) => ({
@@ -57,17 +56,9 @@ const ManageProduct = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    // const { listPermission } = useSelector(state => ({
-    //     listPermission: state.manageReducer.listPermission,
-    // }), shallowEqual)
-
-    // useEffect(() => {
-    //     dispatch(actionGetListPermission())
-    // }, [dispatch])
-
     const { dataProduct } = useSelector(
         (state) => ({
-            dataProduct: state.productReducer.dataProduct
+            dataProduct: state.productReducer.dataProduct,
         }),
         shallowEqual
     );
@@ -93,7 +84,7 @@ const ManageProduct = () => {
 
     const handleDelete = (id) => {
         if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePermission({ id }));
+            const res = dispatch(actionDeleteProduct({ id }));
             if (res) {
                 message.success("Xóa thành công!");
             }
@@ -111,7 +102,7 @@ const ManageProduct = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPermission({ name: event.target.value }))
+        dispatch(actionGetListProduct({ name: event.target.value }))
     }, 500)
 
 

@@ -12,21 +12,18 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
-    Chip,
-    Avatar
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListAdmin, actionGetListRole, actionDeleteAdmin } from "redux/manage/action";
+import { actionGetListBrand, actionDeleteBrand } from "redux/product/action";
 import { SimpleCard, Breadcrumb } from "app/components";
 import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
-import DialogCUAdmin from "./DialogCUAdmin";
-import { actionLoading } from "redux/home/action";
+import DialogCUBrand from "./DialogCUBrand";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -47,7 +44,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
     },
 }));
 
-const ManageAdmin = () => {
+const ManageBrand = () => {
     const dispatch = useDispatch()
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -55,14 +52,12 @@ const ManageAdmin = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listAdmin, listRole } = useSelector(state => ({
-        listAdmin: state.manageReducer.listAdmin,
-        listRole: state.manageReducer.listRole,
+    const { dataBrand } = useSelector(state => ({
+        dataBrand: state.productReducer.dataBrand
     }), shallowEqual)
 
     useEffect(() => {
-        dispatch(actionGetListAdmin())
-        dispatch(actionGetListRole())
+        dispatch(actionGetListBrand())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -79,6 +74,15 @@ const ManageAdmin = () => {
         setOpen(false)
     }, []);
 
+    const handleDelete = (id) => {
+        if (window.confirm("Bạn có muốn xóa?")) {
+            const res = dispatch(actionDeleteBrand({ id }));
+            if (res) {
+                message.success("Xóa thành công!");
+            }
+        }
+    }
+
     const handleChangePage = (_, newPage) => {
         setPage(newPage);
     };
@@ -90,80 +94,36 @@ const ManageAdmin = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        const { name, value } = event.target
-        dispatch(actionGetListAdmin({
-            [name]: value,
-        }))
+        dispatch(actionGetListBrand({ name: event.target.value }))
     }, 500)
-
-    const handleDelete = (id) => {
-        if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeleteAdmin({ id }));
-            if (res) {
-                message.success("Xóa thành công!");
-            }
-        }
-    }
-
-    const handleExportExcel = async () => {
-        dispatch(actionLoading(true))
-        const url = new URL(`${process.env.REACT_APP_API_URL}/api/exportExcel/list-user`)
-        const accessToken = localStorage.getItem('token')
-        url.searchParams.append('token', accessToken)
-        window.open(url)
-        dispatch(actionLoading(false))
-    }
 
     return (
         <Container>
             <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/admin/manage" }, { name: "Quản lý admin" }]} />
+                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/dashboard" }, { name: "Quản lý nhãn hàng" }]} />
             </Box>
             <SimpleCard title={
                 <div >
-                    <Box width="100%" marginBottom="36px">Danh sách admin</Box>
+                    <Box width="100%" marginBottom="36px">Danh sách nhãn hàng</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                        <Box>
-                            <TextField
-                                type="text"
-                                name="name"
-                                label="Tìm kiếm theo tên"
-                                onChange={handleChangeSearchDelay}
-                                size="small"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchOutlinedIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                style={{ marginRight: '15px' }}
-                            />
+                        <TextField
+                            type="text"
+                            name="name"
+                            label="Tìm kiếm theo tên"
+                            onChange={handleChangeSearchDelay}
+                            size="small"
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchOutlinedIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
 
-                            <TextField
-                                type="email"
-                                name="email"
-                                label="Tìm kiếm theo email"
-                                onChange={handleChangeSearchDelay}
-                                size="small"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchOutlinedIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </Box>
-
-                        <Box>
-                            <Button variant="outlined" color="success" onClick={handleExportExcel} style={{ marginRight: 15 }}>
-                                Export Excel
-                            </Button>
-                            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                                Thêm mới
-                            </Button>
-                        </Box>
+                        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                            Thêm mới
+                        </Button>
                     </Box>
                 </div>
             } >
@@ -172,32 +132,21 @@ const ManageAdmin = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Stt</TableCell>
-                                <TableCell align="center">Tên admin</TableCell>
-                                <TableCell align="center">Vai trò</TableCell>
-                                <TableCell align="center">Email</TableCell>
-                                <TableCell align="center">Trạng thái</TableCell>
+                                <TableCell align="center">Tên nhãn hàng</TableCell>
+                                <TableCell align="center">Mô tả</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {listAdmin?.rows.length > 0
-                                && listAdmin?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                            {dataBrand?.rows.length > 0
+                                && dataBrand?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
                                         </TableCell>
-                                        <TableCell align="center">{item.username}</TableCell>
-                                        <TableCell align="center">{item?.user_role?.role?.name}</TableCell>
-                                        <TableCell align="center">{item.email}</TableCell>
-                                        <TableCell align="center">
-                                            <Chip
-                                                avatar={<Avatar alt="avatar_img" src={item.avatar} />}
-                                                label={item.status ? "Hoạt động" : "Không hoạt động"}
-                                                variant="outlined"
-                                                color={item.status ? "primary" : "error"}
-                                            />
-                                        </TableCell>
+                                        <TableCell align="center">{item.name}</TableCell>
+                                        <TableCell align="center">{item.description}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title="Sửa">
                                                 <IconButton>
@@ -222,7 +171,7 @@ const ManageAdmin = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={listAdmin?.rows.length}
+                        count={dataBrand?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -232,11 +181,10 @@ const ManageAdmin = () => {
                 </Box>
 
                 {open &&
-                    <DialogCUAdmin
+                    <DialogCUBrand
                         open={open}
                         handleClose={handleClose}
                         record={record}
-                        dataRole={listRole?.rows}
                     />
                 }
             </SimpleCard>
@@ -244,4 +192,4 @@ const ManageAdmin = () => {
     );
 };
 
-export default ManageAdmin;
+export default ManageBrand;

@@ -8,6 +8,9 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import { actionRegister } from 'redux/home/action';
+import { useDispatch } from 'react-redux';
+import { message } from 'antd';
 
 const FlexBox = styled(Box)(() => ({ display: 'flex', alignItems: 'center' }));
 
@@ -49,17 +52,22 @@ const validationSchema = Yup.object().shape({
 });
 
 const JwtRegister = () => {
+  const dispatch = useDispatch();
   const theme = useTheme();
   const { register } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleFormSubmit = (values) => {
+  const handleFormSubmit = async (values) => {
     setLoading(true);
 
     try {
-      register(values.email, values.username, values.password);
-      navigate('/');
+      // register(values.email, values.username, values.password);
+      const res = await dispatch(actionRegister(values));
+      if (res) {
+        message.success('Register successfully!');
+      }
+      navigate('/session/signin');
       setLoading(false);
     } catch (e) {
       console.log(e);

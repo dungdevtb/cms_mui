@@ -11,7 +11,7 @@ import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { message } from 'antd';
 import { useDispatch } from 'react-redux';
-import { actionCUCategory } from 'redux/product/action';
+import { actionCUBrand } from 'redux/product/action';
 
 const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
     margin: 0,
@@ -43,7 +43,7 @@ const TextField = styled(TextValidator)(() => ({
     marginBottom: "16px",
 }));
 
-function DialogCUCategory({ open, handleClose, record }) {
+function DialogCUBrand({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
 
@@ -81,7 +81,7 @@ function DialogCUCategory({ open, handleClose, record }) {
             messageSuccess = "Cập nhật thành công!"
         }
 
-        dispatch(actionCUCategory(dataSubmit));
+        dispatch(actionCUBrand(dataSubmit));
         handleClose();
         return message.success(messageSuccess);
     };
@@ -105,11 +105,11 @@ function DialogCUCategory({ open, handleClose, record }) {
                                 <TextField
                                     type="text"
                                     name="name"
-                                    label="Tên danh mục"
+                                    label="Tên nhãn hàng"
                                     onChange={handleChange}
                                     value={dataSubmit.name || ""}
                                     validators={["required"]}
-                                    errorMessages={["Vui lòng nhập tên danh mục!"]}
+                                    errorMessages={["Vui lòng nhập tên nhãn hàng!"]}
                                     style={{ width: '100%' }}
                                 />
 
@@ -140,4 +140,4 @@ function DialogCUCategory({ open, handleClose, record }) {
     );
 }
 
-export default React.memo(DialogCUCategory); // DialogCUCategory
+export default React.memo(DialogCUBrand); // DialogCUBrand
