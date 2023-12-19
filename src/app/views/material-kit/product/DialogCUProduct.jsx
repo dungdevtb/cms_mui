@@ -31,6 +31,11 @@ function DialogCUProduct({ open, handleClose, record }) {
         '/assets/images/imageDefault.png'
     );
 
+    const [fileColorUpload, setFileColorUpload] = useState(null);
+    const [oldFileColorUpload, setOldFileColorUpload] = useState(
+        '/assets/images/imageDefault.png'
+    );
+
     const [colors, setColors] = useState([])
     const [sizes, setSizes] = useState([])
     const [newColor, setNewColor] = useState([])
@@ -100,25 +105,58 @@ function DialogCUProduct({ open, handleClose, record }) {
         if (!fileUpload && !oldFileUpload) {
             return message.error('Vui lòng tải ảnh!');
         }
+
         let image = '';
         if (fileUpload) {
             let newUploadFile = new FormData();
             newUploadFile.append('file', fileUpload);
-            image = await dispatch(actionUploadOneFile(newUploadFile));
+            // image = await dispatch(actionUploadOneFile(newUploadFile));
         }
 
         let dataPayload = {
             ...dataSubmit,
             image: fileUpload ? image : oldFileUpload,
-            color: colors,
+            // color: JSON.stringify(colors),
+            // size_quantity: JSON.stringify(sizes),
+            // color: colors,
+            color: { color: colors },
             size_quantity: sizes,
             quantity: handleTotalQuantity()
         }
 
-        console.log(dataPayload, 'dataPayload');
-        dispatch(actionCUProduct(dataSubmit));
-        handleClose();
-        return message.success(messageSuccess);
+        let array_value = Object.values(dataPayload)
+        for (let itemPayload of array_value) {
+            let array_color = []
+
+            if (itemPayload?.color?.length) {
+                array_color = itemPayload?.color?.map(async (item) => {
+                    if (typeof item.image === 'string') {
+                        return { ...item }
+                    } else {
+                        let newUploadFile = new FormData();
+                        newUploadFile.append('file', item.image);
+                        let image_color = await dispatch(actionUploadOneFile(newUploadFile));
+                        return { ...item, image: image_color }
+                    }
+                })
+                itemPayload.color = await Promise.all(array_color)
+            }
+        }
+
+        console.log(array_value, 'array_value');
+
+        let value_payload = array_value.map(item => {
+            return {
+                ...item,
+            }
+        })
+
+        console.log(value_payload, 'value_payload');
+
+        // console.log(dataPayload, 'dataPayload');
+        // dispatch(actionCUProduct(dataPayload));
+        // handleClose();
+        // return message.success(messageSuccess);
     };
 
     const uploadProps = {
