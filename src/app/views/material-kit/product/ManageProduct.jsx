@@ -155,7 +155,7 @@ const ManageProduct = () => {
 
                         <TableBody>
                             {dataProduct?.rows.length > 0
-                                && dataProduct?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                                ? dataProduct?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
@@ -193,7 +193,7 @@ const ManageProduct = () => {
                                             </Tooltip>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )) : <span style={{ textAlign: 'center', width: '100%' }}>Không có dữ liệu</span>}
                         </TableBody>
                     </StyledTable>
                     <TablePagination

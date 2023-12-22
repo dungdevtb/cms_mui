@@ -31,14 +31,8 @@ function DialogCUProduct({ open, handleClose, record }) {
         '/assets/images/imageDefault.png'
     );
 
-    const [fileColorUpload, setFileColorUpload] = useState(null);
-    const [oldFileColorUpload, setOldFileColorUpload] = useState(
-        '/assets/images/imageDefault.png'
-    );
-
     const [colors, setColors] = useState([])
     const [sizes, setSizes] = useState([])
-    const [newColor, setNewColor] = useState([])
 
     const { dataBrand, dataCategory } = useSelector(
         (state) => ({
@@ -97,7 +91,6 @@ function DialogCUProduct({ open, handleClose, record }) {
 
     const handleSubmit = async () => {
         let messageSuccess = "Thêm mới thành công!"
-
         if (record && record?.id) {
             messageSuccess = "Cập nhật thành công!"
         }
@@ -110,53 +103,56 @@ function DialogCUProduct({ open, handleClose, record }) {
         if (fileUpload) {
             let newUploadFile = new FormData();
             newUploadFile.append('file', fileUpload);
-            // image = await dispatch(actionUploadOneFile(newUploadFile));
+            image = await dispatch(actionUploadOneFile(newUploadFile));
         }
 
         let dataPayload = {
             ...dataSubmit,
             image: fileUpload ? image : oldFileUpload,
-            // color: JSON.stringify(colors),
-            // size_quantity: JSON.stringify(sizes),
             // color: colors,
-            color: { color: colors },
             size_quantity: sizes,
             quantity: handleTotalQuantity()
         }
 
-        let array_value = Object.values(dataPayload)
-        for (let itemPayload of array_value) {
-            let array_color = []
+        // let array_color = []
+        // if (dataPayload?.color?.length) {
+        //     array_color = dataPayload?.color?.map(async (item) => {
+        //         if (typeof item.image === 'string') {
+        //             return { ...item }
+        //         } else {
+        //             let newUploadFile = new FormData();
+        //             newUploadFile.append('file', item.image);
+        //             let image_color = await dispatch(actionUploadOneFile(newUploadFile));
+        //             return { ...item, image: image_color }
+        //         }
+        //     })
+        //     dataPayload.color = await Promise.all(array_color)
+        // }
 
-            if (itemPayload?.color?.length) {
-                array_color = itemPayload?.color?.map(async (item) => {
-                    if (typeof item.image === 'string') {
-                        return { ...item }
-                    } else {
-                        let newUploadFile = new FormData();
-                        newUploadFile.append('file', item.image);
-                        let image_color = await dispatch(actionUploadOneFile(newUploadFile));
-                        return { ...item, image: image_color }
-                    }
-                })
-                itemPayload.color = await Promise.all(array_color)
-            }
+        let array_size_color = []
+        if (dataPayload?.size_quantity?.length > 0) {
+            await dataPayload?.size_quantity?.map(async (item) => {
+                if (item.colors.length > 0) {
+                    array_size_color = item.colors?.map(async (item_color) => {
+                        if (typeof item_color.image === 'string') {
+                            return { ...item_color }
+                        } else {
+                            let newUploadFile = new FormData();
+                            newUploadFile.append('file', item_color.image);
+                            let image_color = await dispatch(actionUploadOneFile(newUploadFile));
+                            return { ...item_color, image: image_color }
+                        }
+                    })
+                    item.colors = await Promise.all(array_size_color)
+                }
+            })
         }
 
-        console.log(array_value, 'array_value');
-
-        let value_payload = array_value.map(item => {
-            return {
-                ...item,
-            }
-        })
-
-        console.log(value_payload, 'value_payload');
-
-        // console.log(dataPayload, 'dataPayload');
-        // dispatch(actionCUProduct(dataPayload));
-        // handleClose();
-        // return message.success(messageSuccess);
+        const res = await dispatch(actionCUProduct(dataPayload));
+        // if (res) {
+        //     message.success(messageSuccess);
+        //     handleClose();
+        // }
     };
 
     const uploadProps = {
@@ -236,7 +232,7 @@ function DialogCUProduct({ open, handleClose, record }) {
         }
     }
 
-    const handleChangeQuantity = _.debounce((event, sizeIndex, colorIndex) => {
+    const handleChangeQuantity = (event, sizeIndex, colorIndex) => {
         const newSizes = sizes.map((size, i) => {
             if (i === sizeIndex) {
                 const newColors = size.colors.map((color, j) => {
@@ -257,8 +253,7 @@ function DialogCUProduct({ open, handleClose, record }) {
         });
 
         setSizes(newSizes);
-    }, 100);
-
+    }
 
     const handleAddColor = () => {
         let new_arr_sub = [...colors];
@@ -295,7 +290,6 @@ function DialogCUProduct({ open, handleClose, record }) {
 
         return totalQuantity;
     };
-
 
     return (
         <Box>
