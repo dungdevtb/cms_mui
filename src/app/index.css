@@ -14,3 +14,16 @@
 /* .css-honmcm-MuiGrid-root>.MuiGrid-item{
   padding-top: 0px;
 } */
+
+.ant-picker-dropdown{
+  z-index: 1400 !important;
+}
+
+.codex-editor {
+  border: 1px solid #ccc !important;
+}
+
+.codex-editor .codex-editor__redactor {
+  padding-bottom: 100px !important;
+  padding-left: 20px !important;
+}

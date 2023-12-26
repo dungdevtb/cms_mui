@@ -141,7 +141,7 @@ export const actionDeleteCategory = (payload) => async (dispatch, getState) => {
 }
 
 export const actionSaveListCategory = (payload) => ({
-  type: Types.SAVE_LIST_cATEGORY,
+  type: Types.SAVE_LIST_CATEGORY,
   payload
 });
 

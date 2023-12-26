@@ -5,12 +5,12 @@ import {
     DialogContent,
     styled, Grid,
     Typography, IconButton,
-    CircularProgress,
+    // CircularProgress,
     Select, MenuItem,
     InputLabel, FormControlLabel,
     Switch, FormControl
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+// import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";

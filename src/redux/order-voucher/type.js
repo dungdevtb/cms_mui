@@ -1,0 +1,4 @@
+export const Types = {
+    SAVE_LIST_ORDER: 'SAVE_LIST_ORDER',
+    SAVE_LIST_VOUCHER: 'SAVE_LIST_VOUCHER',
+}

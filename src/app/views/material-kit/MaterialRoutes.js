@@ -3,6 +3,7 @@ import Loadable from 'app/components/Loadable';
 import ManageProduct from './product/ManageProduct';
 import ManageCategory from './product/MannageCategory';
 import ManageBrand from './product/ManageBrand';
+import ManageVoucher from './order-voucher/ManageVoucher';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -50,6 +51,10 @@ const materialRoutes = [
   { path: '/product/list', element: <ManageProduct /> },
   { path: '/product/category', element: <ManageCategory /> },
   { path: '/product/brand', element: <ManageBrand /> },
+
+  //order-voucher
+  { path: '/order/list', element: <AppTable /> },
+  { path: '/voucher/list', element: <ManageVoucher /> },
 
 
 ];

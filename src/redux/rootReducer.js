@@ -5,12 +5,14 @@ import * as auth from '../app/modules/_redux/authRedux';
 import homeReducer from './home/reducer';
 import manageReducer from './manage/reducer';
 import productReducer from './product/reducer';
+import orderReducer from './order-voucher/reducer';
 
 export const rootReducer = combineReducers({
   auth: auth.reducer,
   homeReducer: homeReducer,
   manageReducer: manageReducer,
-  productReducer: productReducer
+  productReducer: productReducer,
+  orderReducer: orderReducer
 });
 
 export function* rootSaga() {

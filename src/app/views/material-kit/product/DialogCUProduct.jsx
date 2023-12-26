@@ -24,7 +24,7 @@ const TextField = styled(TextValidator)(() => ({
 function DialogCUProduct({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({
-        status: false
+        status: 0
     })
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
@@ -481,14 +481,19 @@ function DialogCUProduct({ open, handleClose, record }) {
                                 ))}
                                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2, ml: 8 }}>
                                     <span onClick={handleAddSize}> + Thêm kích cỡ và số lượng </span>
+                                    <div style={{ marginTop: 20 }}>Tổng số lượng: {handleTotalQuantity()} </div>
                                 </Grid>
                             </Grid>
                             <Grid item lg={6} md={6} sm={6} xs={6}>
-                                <InputLabel id="demo-simple-label">Tổng số lượng</InputLabel>
+                                {/* <InputLabel id="demo-simple-label">Tổng số lượng</InputLabel> */}
                                 <TextField
-                                    type="number"
-                                    value={dataSubmit?.quantity || handleTotalQuantity()}
+                                    type="text"
+                                    name="display_order"
+                                    label="Thứ tự hiển thị"
+                                    value={dataSubmit?.display_order || ""}
                                     size="small"
+                                    onChange={handleChange}
+                                    fullWidth
                                 />
                             </Grid>
                             <Grid item lg={6} md={6} sm={6} xs={6}>

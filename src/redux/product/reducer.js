@@ -22,7 +22,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         dataProduct: action.payload
       };
-    case Types.SAVE_LIST_cATEGORY:
+    case Types.SAVE_LIST_CATEGORY:
       return {
         ...state,
         dataCategory: action.payload
