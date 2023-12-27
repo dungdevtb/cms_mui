@@ -5,10 +5,12 @@ import {
     DialogContent,
     styled, Grid,
     Typography, IconButton,
-    InputLabel, FormControl,
+    InputLabel,
     Select, Switch,
-    FormControlLabel, MenuItem
+    FormControlLabel, MenuItem,
+    OutlinedInput, Chip,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
@@ -17,8 +19,9 @@ import { message, DatePicker, Upload } from 'antd';
 import moment from 'moment';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { actionGetListCategory, actionGetListProduct } from 'redux/product/action';
-import { jsonToHtml } from 'app/lib/common';
 import { actionUploadOneFile } from 'redux/upload/action';
+import { actionCUVoucher } from 'redux/order-voucher/action';
+import { jsonToHtml } from 'app/lib/common';
 
 const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
     margin: 0,
@@ -62,24 +65,45 @@ const EDITOR_JS_TOOLS_TEXT = {
     },
 }
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
+function getStyles(name, personName, theme) {
+    return {
+        fontWeight:
+            personName.indexOf(name) === -1
+                ? theme.typography.fontWeightRegular
+                : theme.typography.fontWeightMedium,
+    };
+}
 
 function DialogCUVoucher({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
+    let date = moment("2000-01-01T00:00:00.000Z").format("DD/MM/YYYY HH:mm:ss")
     const [minDate, setMinDate] = useState(null);
     const [maxDate, setMaxDate] = useState(null);
-    const editorCore = useRef(null)
+    const editorCore = useRef(null);
 
-
+    const theme = useTheme();
+    const [products, setProducts] = useState([])
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
         '/assets/images/upload.png'
     );
 
-    const { dataProduct, dataCategory } = useSelector(
+    const { dataProduct, dataCategory, infoUser } = useSelector(
         (state) => ({
             dataProduct: state.productReducer.dataProduct,
-            dataCategory: state.productReducer.dataCategory
+            dataCategory: state.productReducer.dataCategory,
+            infoUser: state.homeReducer.infoUser,
         }),
         shallowEqual
     );
@@ -89,18 +113,27 @@ function DialogCUVoucher({ open, handleClose, record }) {
             setDataSubmit({
                 ...dataSubmit,
                 name: record.name,
-                slug: record.slug
+                code: record.code,
+                type_voucher: record.type_voucher,
+                status: record.status === 1 ? true : false,
+                type: record.type,
+                percent: record.percent,
+                max_money: record.max_money,
+                total: record.total,
+                used: record.used,
+                all: record.all,
             })
 
             setOldFileUpload(record?.image)
             setMaxDate(moment(record?.exp).format("DD/MM/YYYY HH:mm:ss"))
-            // setMinDate(moment(record?.start).format("DD/MM/YYYY HH:mm:ss"))
-            setMinDate(record?.start)
-        }
+            setMinDate(moment(record?.start).format("DD/MM/YYYY HH:mm:ss"))
 
-        console.log(record);
+            let productVoucher = record.voucher_product.map(item => item.product)
+            setProducts(productVoucher)
+
+            console.log(record, 'record');
+        }
     }, [])
-    console.log(minDate);
 
     useEffect(() => {
         dispatch(actionGetListCategory());
@@ -121,14 +154,14 @@ function DialogCUVoucher({ open, handleClose, record }) {
                 // [name]: type === 'checkbox' ? checked : value
                 id: record?.id,
                 [name]: value,
-                status: checked === true ? 1 : 0
+                status: checked === true ? 1 : 0,
             }));
         } else {
             setDataSubmit((prevData) => ({
                 ...prevData,
                 // [name]: type === 'checkbox' ? checked : value
                 [name]: value,
-                status: checked === true ? 1 : 0
+                status: checked === true ? 1 : 0,
             }));
         }
     };
@@ -150,6 +183,8 @@ function DialogCUVoucher({ open, handleClose, record }) {
             image = await dispatch(actionUploadOneFile(newUploadFile));
         }
 
+        let productVoucher = dataSubmit.all === 1 ? dataProduct.rows : products
+
         let dataPayload = {
             ...dataSubmit,
             html,
@@ -157,16 +192,20 @@ function DialogCUVoucher({ open, handleClose, record }) {
             image: fileUpload ? image : oldFileUpload,
             start: moment(minDate),
             exp: moment(maxDate),
+            user_id_created: infoUser?.id,
+            products: productVoucher
         }
 
         if (record && record.id) {
             messageSuccess = "Cập nhật thành công!"
         }
+
         console.log(dataPayload);
-        // dispatch(actionCUPermission(dataSubmit));
-        // handleClose();
-        // return message.success(messageSuccess);
+        dispatch(actionCUVoucher(dataPayload));
+        handleClose();
+        return message.success(messageSuccess);
     };
+
 
     const disableTimeEnd = (current) => {
         if (current && current < moment(minDate, "DD/MM/YYYY HH:mm:ss")) {
@@ -217,9 +256,12 @@ function DialogCUVoucher({ open, handleClose, record }) {
         }
     };
 
-    // console.log(dataSubmit);
-
-    // console.log(moment(minDate));
+    const handleChangeProduct = (event) => {
+        const { target: { value } } = event
+        setProducts(
+            typeof value === 'string' ? value.split(',') : value,
+        )
+    }
 
     return (
         <Box>
@@ -251,13 +293,13 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                     style={{ width: '100%' }}
                                     size="small"
                                 >
-                                    <MenuItem value={0}>Voucher cho đơn hàng</MenuItem>
-                                    <MenuItem value={1}>Voucher cho sản phẩm</MenuItem>
+                                    <MenuItem value={1}>Voucher cho đơn hàng</MenuItem>
+                                    <MenuItem value={2}>Voucher cho sản phẩm</MenuItem>
                                 </Select>
                                 {/* </FormControl> */}
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <InputLabel id="demo-simple-label">Ảnh đại diện</InputLabel>
+                                <InputLabel id="demo-simple-label">Hình ảnh</InputLabel>
                                 <Upload {...uploadProps}>
                                     <img
                                         src={fileUpload?.newImg || oldFileUpload}
@@ -280,7 +322,6 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                     size="small"
                                 />
                             </Grid>
-
                             <Grid item lg={6} md={6} sm={12} xs={12} >
                                 <TextField
                                     type="text"
@@ -340,13 +381,13 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                     format="DD/MM/YYYY HH:mm:ss"
                                     // placeholder='Chọn ngày bắt đầu ...'
                                     showTime={{ defaultValue: moment("00:00:00", "HH:mm:ss") }}
-                                    disabledTime={disableTimeStart}
+                                    // disabledTime={disableTimeStart}
                                     style={{ width: '100%' }}
                                     onChange={(date) => setMinDate(date)}
-                                    disabledDate={(current) => {
-                                        return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
-                                    }}
-                                // value={minDate}
+                                // disabledDate={(current) => {
+                                //     return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
+                                // }}
+                                // value={moment(minDate, "DD/MM/YYYY HH:mm:ss")}
                                 />
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
@@ -363,6 +404,7 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                     disabledDate={(current) => {
                                         return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
                                     }}
+                                // value={moment(maxDate, "DD/MM/YYYY HH:mm:ss")}
                                 />
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
@@ -390,59 +432,68 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                     size="small"
                                 />
                             </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="select-label">Chọn sản phẩm áp dụng</InputLabel>
-                                <Select
-                                    name="product"
-                                    labelId="select-label"
-                                    onChange={handleChange}
-                                    value={dataSubmit.product || ""}
-                                    errorMessages={["Vui lòng nhập loại giảm giá!"]}
-                                    style={{ width: '100%' }}
-                                    size="small"
-                                    defaultValue={1}
-                                >
-                                    <MenuItem value={1}>Tất cả</MenuItem>
-                                    <MenuItem value={2}>Danh mục</MenuItem>
-                                    <MenuItem value={3}>Danh sách sản phẩm</MenuItem>
-                                </Select>
-                            </Grid>
-                            {dataSubmit.product === 2 && <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="select-label">Danh mục sản phẩm</InputLabel>
-                                <Select
-                                    name="category"
-                                    labelId="select-label"
-                                    onChange={handleChange}
-                                    value={dataSubmit.category || ""}
-                                    errorMessages={["Vui lòng nhập loại giảm giá!"]}
-                                    style={{ width: '100%' }}
-                                    size="small"
-                                    defaultValue={1}
-                                >
-                                    {dataCategory?.rows?.map((item, index) => (
-                                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </Grid>}
+                            {dataSubmit.type_voucher === 2 &&
+                                <>
+                                    <Grid item lg={6} md={6} sm={12} xs={12} >
+                                        <InputLabel id="select-label">Chọn sản phẩm áp dụng</InputLabel>
+                                        <Select
+                                            name="all"
+                                            labelId="select-label"
+                                            onChange={handleChange}
+                                            value={dataSubmit.all || ""}
+                                            errorMessages={["Vui lòng nhập loại giảm giá!"]}
+                                            style={{ width: '100%' }}
+                                            size="small"
+                                            defaultValue={1}
+                                        >
+                                            <MenuItem value={1}>Tất cả</MenuItem>
+                                            <MenuItem value={2}>Danh mục</MenuItem>
+                                            <MenuItem value={3}>Danh sách sản phẩm</MenuItem>
+                                        </Select>
+                                    </Grid>
 
-                            {dataSubmit.product === 3 &&
-                                <Grid item lg={6} md={6} sm={12} xs={12} >
-                                    <InputLabel id="select-label">Danh sách sản phẩm</InputLabel>
-                                    <Select
-                                        name="products"
-                                        labelId="select-label"
-                                        onChange={handleChange}
-                                        value={dataSubmit.products || ""}
-                                        errorMessages={["Vui là chọn danh mục!"]}
-                                        style={{ width: '100%' }}
-                                        size="small"
-                                        defaultValue={1}
-                                    >
-                                        {dataProduct?.rows?.map((item, index) => (
-                                            <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </Grid>
+                                    {dataSubmit.all === 2 && <Grid item lg={6} md={6} sm={12} xs={12} >
+                                        <InputLabel id="select-label">Danh mục sản phẩm</InputLabel>
+                                        <Select
+                                            name="category"
+                                            labelId="select-label"
+                                            onChange={handleChange}
+                                            value={dataSubmit.category || ""}
+                                            errorMessages={["Vui lòng nhập loại giảm giá!"]}
+                                            style={{ width: '100%' }}
+                                            size="small"
+                                        >
+                                            {dataCategory?.rows?.map((item, index) => (
+                                                <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </Grid>}
+
+                                    {dataSubmit.all === 3 && <Grid item lg={6} md={6} sm={12} xs={12} >
+                                        <InputLabel id="select-label">Danh sách sản phẩm</InputLabel>
+                                        <Select
+                                            name="products"
+                                            labelId="select-label"
+                                            style={{ width: '100%' }}
+                                            size="small"
+                                            onChange={handleChangeProduct}
+                                            value={products}
+                                            multiple
+                                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                            renderValue={(selected) => (<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value) => (
+                                                    <Chip key={value.id} label={value.name} color="primary" variant="outlined" />
+                                                ))}
+                                            </Box>
+                                            )}
+                                            MenuProps={MenuProps}
+                                        >
+                                            {dataProduct?.rows?.map((item, index) => (
+                                                <MenuItem key={index} value={item} style={getStyles(item, products, theme)}>{item.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </Grid>}
+                                </>
                             }
 
                             <Grid item lg={6} md={6} sm={12} xs={12} >

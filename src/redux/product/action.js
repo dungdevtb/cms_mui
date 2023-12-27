@@ -34,7 +34,6 @@ export const actionGetListProduct = (payload) => async (dispatch, getState) => {
 export const actionCUProduct = (payload) => async (dispatch, getState) => {
   try {
     dispatch(actionLoading(true))
-    console.log('payloadddddddd', payload);
 
     let response = await fetchApi('/api/product/create_update_product', 'post', payload)
 

@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
@@ -67,7 +66,6 @@ const ManageVoucher = () => {
         dispatch(actionGetListVoucher());
     }, [dispatch]);
 
-
     const handleClickOpen = useCallback((itemEdit) => {
         if (itemEdit) {
             setRecord(itemEdit)
@@ -104,8 +102,6 @@ const ManageVoucher = () => {
         event.persist();
         dispatch(actionGetListVoucher({ name: event.target.value }))
     }, 500)
-
-    // console.log(dataVoucher, 'checkkkkk');
 
     return (
         <Container>
@@ -163,7 +159,7 @@ const ManageVoucher = () => {
                                         </TableCell>
                                         <TableCell align="center">{item.code}</TableCell>
                                         <TableCell align="center">{item.name}</TableCell>
-                                        <TableCell align="center">{item.type_voucher === 1 ?
+                                        <TableCell align="center">{item.type_voucher === 2 ?
                                             <Chip label="Sản phẩm" color="primary" variant="outlined" />
                                             : <Chip label="Đơn hàng" color="success" variant="outlined" />}</TableCell>
                                         <TableCell align="center">{item.type === 'percent' ?

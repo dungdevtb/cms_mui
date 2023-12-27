@@ -23,13 +23,12 @@ const TextField = styled(TextValidator)(() => ({
 
 function DialogCUProduct({ open, handleClose, record }) {
     const dispatch = useDispatch()
-    const [dataSubmit, setDataSubmit] = useState({
-        status: 0
-    })
+    const [dataSubmit, setDataSubmit] = useState({})
     const [fileUpload, setFileUpload] = useState(null);
     const [oldFileUpload, setOldFileUpload] = useState(
-        '/assets/images/imageDefault.png'
+        '/assets/images/upload.png'
     );
+    const [status, setStatus] = useState(false);
 
     const [colors, setColors] = useState([])
     const [sizes, setSizes] = useState([])
@@ -58,17 +57,20 @@ function DialogCUProduct({ open, handleClose, record }) {
                 sell_price: record?.sell_price,
                 category_id: record?.category?.id,
                 brand_id: record?.brand?.id,
-                status: record?.status === 1 ? true : false
+                display_order: record?.display_order,
+                // status: record?.status === 1 ? true : false
             })
 
-            setColors(record?.color)
-            setSizes(record?.size_quantity)
+            let colorSize = record?.sizes[0].size_color.map(it => it.color)
+            setColors(colorSize)
+            setSizes(record?.sizes)
             setOldFileUpload(record?.image)
+            setStatus(record?.status === 1 ? true : false)
+            console.log(record, 'record');
         }
     }, [])
 
     const handleChange = (event) => {
-        // event.persist();
         const { name, value, checked, type } = event.target;
 
         if (record && record?.id) {
@@ -77,14 +79,14 @@ function DialogCUProduct({ open, handleClose, record }) {
                 // [name]: type === 'checkbox' ? checked : value
                 id: record?.id,
                 [name]: value,
-                status: checked === true ? 1 : 0
+                // status: checked === true ? 1 : 0
             }));
         } else {
             setDataSubmit((prevData) => ({
                 ...prevData,
                 // [name]: type === 'checkbox' ? checked : value
                 [name]: value,
-                status: checked === true ? 1 : 0
+                // status: checked === true ? 1 : 0
             }));
         }
     };
@@ -111,7 +113,8 @@ function DialogCUProduct({ open, handleClose, record }) {
             image: fileUpload ? image : oldFileUpload,
             // color: colors,
             size_quantity: sizes,
-            quantity: handleTotalQuantity()
+            quantity: handleTotalQuantity(),
+            status: status === true ? 1 : 0
         }
 
         // let array_color = []
@@ -131,32 +134,31 @@ function DialogCUProduct({ open, handleClose, record }) {
 
         let array_size_color = []
         if (dataPayload?.size_quantity?.length > 0) {
-            await dataPayload?.size_quantity?.map(async (item) => {
+            await Promise.all(dataPayload?.size_quantity?.map(async (item) => {
                 if (item.colors.length > 0) {
-                    array_size_color = item.colors?.map(async (item_color) => {
+                    array_size_color = await Promise.all(item.colors?.map(async (item_color) => {
                         if (typeof item_color.image === 'string') {
-                            return { ...item_color }
+                            return { ...item_color };
                         } else {
                             let newUploadFile = new FormData();
                             newUploadFile.append('file', item_color.image);
                             let image_color = await dispatch(actionUploadOneFile(newUploadFile));
-                            return { ...item_color, image: image_color }
+                            return { ...item_color, image: image_color };
                         }
-                    })
-                    item.colors = await Promise.all(array_size_color)
+                    }));
+                    item.colors = array_size_color;
                 }
-            })
+            }));
         }
 
         const res = await dispatch(actionCUProduct(dataPayload));
-        // if (res) {
-        //     message.success(messageSuccess);
-        //     handleClose();
-        // }
+        if (res) {
+            message.success(messageSuccess);
+            handleClose();
+        }
     };
 
     const uploadProps = {
-        // multiple: true,
         accept: 'image/png,image/jpeg,image/svg+xml,image/webp',
         beforeUpload: (file, fileList) => {
             if (
@@ -290,6 +292,10 @@ function DialogCUProduct({ open, handleClose, record }) {
 
         return totalQuantity;
     };
+
+    const handleSwitch = (e) => {
+        setStatus(e.target.checked);
+    }
 
     return (
         <Box>
@@ -499,8 +505,8 @@ function DialogCUProduct({ open, handleClose, record }) {
                             <Grid item lg={6} md={6} sm={6} xs={6}>
                                 <InputLabel id="demo-simple-switch-label">Trạng thái sản phẩm</InputLabel>
                                 <FormControlLabel
-                                    control={<Switch checked={dataSubmit?.status} onChange={handleChange} name='status' />}
-                                    label={dataSubmit?.status ? "Công bố" : "Không công bố"}
+                                    control={<Switch checked={status} onChange={handleSwitch} name='status' />}
+                                    label={status ? "Công bố" : "Không công bố"}
                                     style={{ marginBottom: 12 }}
                                 />
                             </Grid>
