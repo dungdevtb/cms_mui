@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { createReactEditorJS } from 'react-editor-js';
-import { message, DatePicker, Upload } from 'antd';
+import { message, DatePicker, Upload, Form } from 'antd';
 import moment from 'moment';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { actionGetListCategory, actionGetListProduct } from 'redux/product/action';
@@ -84,6 +84,8 @@ function getStyles(name, personName, theme) {
     };
 }
 
+const formRef = React.createRef()
+
 function DialogCUVoucher({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
@@ -130,6 +132,11 @@ function DialogCUVoucher({ open, handleClose, record }) {
 
             let productVoucher = record.voucher_product.map(item => item.product)
             setProducts(productVoucher)
+
+            // formRef?.current?.setFieldsValue({
+            //     start: moment(record.start),
+            //     exp: moment(record.exp),
+            // })
 
             console.log(record, 'record');
         }
@@ -373,9 +380,26 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                         style={{ width: '100%' }}
                                     />}
                             </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="date_start_label">Ngày bắt đầu</InputLabel>
-                                <DatePicker
+                            <Form ref={formRef}>
+                                <Grid item lg={6} md={6} sm={12} xs={12} >
+                                    <InputLabel id="date_start_label">Ngày bắt đầu</InputLabel>
+                                    <Form.Item name="start">
+                                        <DatePicker
+                                            id='date_start_label'
+                                            name='start'
+                                            format="DD/MM/YYYY HH:mm:ss"
+                                            // placeholder='Chọn ngày bắt đầu ...'
+                                            showTime={{ defaultValue: moment("00:00:00", "HH:mm:ss") }}
+                                            // disabledTime={disableTimeStart}
+                                            style={{ width: '100%' }}
+                                            onChange={(date) => setMinDate(date)}
+                                        // disabledDate={(current) => {
+                                        //     return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
+                                        // }}
+                                        // value={moment(minDate, "DD/MM/YYYY HH:mm:ss")}
+                                        />
+                                    </Form.Item>
+                                    {/* <DatePicker
                                     id='date_start_label'
                                     name='start'
                                     format="DD/MM/YYYY HH:mm:ss"
@@ -388,25 +412,28 @@ function DialogCUVoucher({ open, handleClose, record }) {
                                 //     return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
                                 // }}
                                 // value={moment(minDate, "DD/MM/YYYY HH:mm:ss")}
-                                />
-                            </Grid>
-                            <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="date_end_label">Hạn sử dụng</InputLabel>
-                                <DatePicker
-                                    id='date_end_label'
-                                    name='start'
-                                    format="DD/MM/YYYY HH:mm:ss"
-                                    showTime={{ defaultValue: moment("00:00:00", "HH:mm:ss") }}
-                                    disabledTime={disableTimeEnd}
-                                    style={{ width: '100%' }}
-                                    onChange={(date) => setMaxDate(date)}
-                                    // placeholder='Chọn hạn sử dụng ...'
-                                    disabledDate={(current) => {
-                                        return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
-                                    }}
-                                // value={moment(maxDate, "DD/MM/YYYY HH:mm:ss")}
-                                />
-                            </Grid>
+                                /> */}
+                                </Grid>
+                                <Grid item lg={6} md={6} sm={12} xs={12} >
+                                    <InputLabel id="date_end_label">Hạn sử dụng</InputLabel>
+                                    <Form.Item name="exp">
+                                        <DatePicker
+                                            id='date_end_label'
+                                            name='exp'
+                                            format="DD/MM/YYYY HH:mm:ss"
+                                            showTime={{ defaultValue: moment("00:00:00", "HH:mm:ss") }}
+                                            disabledTime={disableTimeEnd}
+                                            style={{ width: '100%' }}
+                                            onChange={(date) => setMaxDate(date)}
+                                            // placeholder='Chọn hạn sử dụng ...'
+                                            disabledDate={(current) => {
+                                                return current && current > moment(maxDate, "DD/MM/YYYY HH:mm:ss");
+                                            }}
+                                        // value={moment(maxDate, "DD/MM/YYYY HH:mm:ss")}
+                                        />
+                                    </Form.Item>
+                                </Grid>
+                            </Form>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
                                 <TextField
                                     type="number"

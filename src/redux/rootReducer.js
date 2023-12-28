@@ -6,13 +6,15 @@ import homeReducer from './home/reducer';
 import manageReducer from './manage/reducer';
 import productReducer from './product/reducer';
 import orderReducer from './order-voucher/reducer';
+import postReducer from './post/reducer';
 
 export const rootReducer = combineReducers({
   auth: auth.reducer,
   homeReducer: homeReducer,
   manageReducer: manageReducer,
   productReducer: productReducer,
-  orderReducer: orderReducer
+  orderReducer: orderReducer,
+  postReducer: postReducer
 });
 
 export function* rootSaga() {

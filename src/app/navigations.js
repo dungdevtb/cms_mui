@@ -25,7 +25,7 @@ export const navigations = [
     icon: 'desktop_mac',
     children: [
       { name: 'Danh sách bài viết', iconText: 'SI', path: '/content/list' },
-      { name: 'Danh sách nhãn', iconText: 'SU', path: '/tag/list' },
+      { name: 'Danh sách nhãn', iconText: 'SU', path: '/content/tag' },
       { name: 'Danh mục bài viết', iconText: 'FP', path: '/content/category' },
       { name: 'Danh sách video', iconText: 'FP', path: '/news/video' },
     ]
