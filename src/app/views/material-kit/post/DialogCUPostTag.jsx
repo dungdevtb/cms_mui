@@ -10,9 +10,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { convertToSlug } from 'app/lib/common';
-import { actionCUPermission } from 'redux/manage/action';
 import { message } from 'antd';
 import { useDispatch } from 'react-redux';
+import { actionCUPostTag } from 'redux/post/action';
 
 const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
     margin: 0,
@@ -83,7 +83,7 @@ function DialogCUPostTag({ open, handleClose, record }) {
             messageSuccess = "Cập nhật thành công!"
         }
 
-        dispatch(actionCUPermission(dataSubmit));
+        dispatch(actionCUPostTag(dataSubmit));
         handleClose();
         return message.success(messageSuccess);
     };
@@ -107,11 +107,11 @@ function DialogCUPostTag({ open, handleClose, record }) {
                                 <TextField
                                     type="text"
                                     name="name"
-                                    label="Tên quyền"
+                                    label="Tên nhãn"
                                     onChange={handleChange}
                                     value={dataSubmit.name || ""}
                                     validators={["required"]}
-                                    errorMessages={["Vui lòng nhập tên quyền!"]}
+                                    errorMessages={["Vui lòng nhập tên nhãn!"]}
                                     style={{ width: '100%' }}
                                 />
 

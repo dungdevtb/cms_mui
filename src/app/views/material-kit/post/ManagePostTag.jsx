@@ -17,13 +17,14 @@ import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
 import DialogCUPostTag from "./DialogCUPostTag";
 import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
+import { actionGetListPostTag, actionDeletePostTag } from "redux/post/action";
+
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -52,12 +53,12 @@ const ManagePostTag = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listPermission } = useSelector(state => ({
-        listPermission: state.manageReducer.listPermission,
+    const { dataPostTag } = useSelector(state => ({
+        dataPostTag: state.postReducer.dataPostTag
     }), shallowEqual)
 
     useEffect(() => {
-        dispatch(actionGetListPermission())
+        dispatch(actionGetListPostTag())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -76,7 +77,7 @@ const ManagePostTag = () => {
 
     const handleDelete = (id) => {
         if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePermission({ id }));
+            const res = dispatch(actionDeletePostTag({ id }));
             if (res) {
                 message.success("Xóa thành công!");
             }
@@ -94,17 +95,17 @@ const ManagePostTag = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPermission({ name: event.target.value }))
+        dispatch(actionGetListPostTag({ name: event.target.value }))
     }, 500)
 
     return (
         <Container>
             <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/admin/manage" }, { name: "Quản lý quyền" }]} />
+                <Breadcrumb routeSegments={[{ name: "Quản lý tin tức", path: "/content/list" }, { name: "Danh sách nhãn" }]} />
             </Box>
             <SimpleCard title={
                 <div >
-                    <Box width="100%" marginBottom="36px">Danh sách quyền</Box>
+                    <Box width="100%" marginBottom="36px">Danh sách nhãn</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
                         <TextField
                             type="text"
@@ -132,15 +133,15 @@ const ManagePostTag = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Stt</TableCell>
-                                <TableCell align="center">Tên quyền</TableCell>
+                                <TableCell align="center">Tên nhãn</TableCell>
                                 <TableCell align="center">Slug</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {listPermission?.rows.length > 0
-                                && listPermission?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                            {dataPostTag?.rows.length > 0
+                                && dataPostTag?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
@@ -171,7 +172,7 @@ const ManagePostTag = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={listPermission?.rows.length}
+                        count={dataPostTag?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
