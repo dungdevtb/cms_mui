@@ -12,19 +12,18 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
-    Chip
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
-import DialogCUPost from "./DialogCUPost";
+import DialogOrder from "./DialogOrder";
 import Button from '@mui/material/Button';
-import { Image, message } from "antd";
+import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
-import { actionGetListPost, actionDeletePost } from "redux/post/action";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -45,7 +44,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
     },
 }));
 
-const ManagePost = () => {
+const ManageOrder = () => {
     const dispatch = useDispatch()
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -53,13 +52,12 @@ const ManagePost = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { dataPost } = useSelector(state => ({
-        dataPost: state.postReducer.dataPost
+    const { listPermission } = useSelector(state => ({
+        listPermission: state.manageReducer.listPermission,
     }), shallowEqual)
 
-
     useEffect(() => {
-        dispatch(actionGetListPost())
+        dispatch(actionGetListPermission())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -78,7 +76,7 @@ const ManagePost = () => {
 
     const handleDelete = (id) => {
         if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePost({ id }));
+            const res = dispatch(actionDeletePermission({ id }));
             if (res) {
                 message.success("Xóa thành công!");
             }
@@ -96,24 +94,22 @@ const ManagePost = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPost({ title: event.target.value }))
+        dispatch(actionGetListPermission({ name: event.target.value }))
     }, 500)
-
-    console.log(dataPost, 'dataPost');
 
     return (
         <Container>
             <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản lý tin tức", path: "/content/list" }, { name: "Danh sách bài viết" }]} />
+                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/admin/manage" }, { name: "Quản lý quyền" }]} />
             </Box>
             <SimpleCard title={
                 <div >
-                    <Box width="100%" marginBottom="36px">Danh sách bài viết</Box>
+                    <Box width="100%" marginBottom="36px">Danh sách quyền</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
                         <TextField
                             type="text"
                             name="name"
-                            label="Tìm kiếm theo tiêu đề"
+                            label="Tìm kiếm theo tên"
                             onChange={handleChangeSearchDelay}
                             size="small"
                             InputProps={{
@@ -136,38 +132,21 @@ const ManagePost = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Stt</TableCell>
-                                <TableCell align="center">Hình ảnh</TableCell>
-                                <TableCell align="center">Tiêu đề</TableCell>
-                                <TableCell align="center">Nổi bật</TableCell>
-                                <TableCell align="center">Trạng thái hiển thị</TableCell>
-                                <TableCell align="center">Thứ tự hiển thị</TableCell>
+                                <TableCell align="center">Tên quyền</TableCell>
+                                <TableCell align="center">Slug</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {dataPost?.rows.length > 0
-                                && dataPost?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                            {listPermission?.rows.length > 0
+                                && listPermission?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
                                         </TableCell>
-                                        <TableCell align="center">
-                                            {/* <img src={item.image} width={100} height={100} alt="" /> */}
-                                            <Image src={item.image} width={100} height={100} alt="" />
-                                        </TableCell>
-                                        <TableCell align="center">{item.title}</TableCell>
-                                        <TableCell align="center">
-                                            {item.hot === 1 ?
-                                                <Chip label="Có" color="primary" variant="outlined" />
-                                                : <Chip label="Không" color="error" variant="outlined" />}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {item.status === 1 ?
-                                                <Chip label="Công bố" color="primary" variant="outlined" />
-                                                : <Chip label="Ẩn" color="error" variant="outlined" />}
-                                        </TableCell>
-                                        <TableCell align="center">{item.display_order}</TableCell>
+                                        <TableCell align="center">{item.name}</TableCell>
+                                        <TableCell align="center">{item.slug}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title="Sửa">
                                                 <IconButton>
@@ -192,7 +171,7 @@ const ManagePost = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={dataPost?.rows.length}
+                        count={listPermission?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -202,7 +181,7 @@ const ManagePost = () => {
                 </Box>
 
                 {open &&
-                    <DialogCUPost
+                    <DialogOrder
                         open={open}
                         handleClose={handleClose}
                         record={record}
@@ -213,4 +192,4 @@ const ManagePost = () => {
     );
 };
 
-export default ManagePost;
+export default ManageOrder;

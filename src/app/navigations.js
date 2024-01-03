@@ -36,7 +36,7 @@ export const navigations = [
     children: [
       { name: 'Danh sách đơn hàng', iconText: 'SI', path: '/order/list' },
       { name: 'Danh sách voucher', iconText: 'SU', path: '/voucher/list' },
-      { name: 'Danh sách quà tặng cho khách hàng', iconText: 'FP', path: '/voucher/gift-to-user' },
+      // { name: 'Danh sách quà tặng cho khách hàng', iconText: 'FP', path: '/voucher/gift-to-user' },
     ]
   },
   {
@@ -46,7 +46,6 @@ export const navigations = [
       { name: 'Danh sách sản phẩm', iconText: 'SI', path: '/product/list' },
       { name: 'Danh sách brand', iconText: 'FG', path: '/product/brand' },
       { name: 'Quản lý danh mục', iconText: 'SU', path: '/product/category' },
-      // { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
     ]
   },
   {
@@ -62,9 +61,9 @@ export const navigations = [
     name: 'Quản lý khách hàng',
     icon: 'person',
     children: [
-      { name: 'Danh sách khách hàng', iconText: 'SI', path: '/admin/manage' },
-      { name: 'Quản lý vai trò', iconText: 'SU', path: '/admin/role' },
-      { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
+      { name: 'Danh sách khách hàng', iconText: 'SI', path: '/customer/list' },
+      // { name: 'Quản lý vai trò', iconText: 'SU', path: '/admin/role' },
+      // { name: 'Quản lý quyền', iconText: 'FP', path: '/admin/permission' },
     ]
   },
   {

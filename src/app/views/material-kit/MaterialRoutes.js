@@ -7,6 +7,8 @@ import ManageVoucher from './order-voucher/ManageVoucher';
 import ManagePostCategory from './post/ManagePostCategory';
 import ManagePostTag from './post/ManagePostTag';
 import ManagePost from './post/ManagePost';
+import ManageCustomer from './customer/ManageCustomer';
+import ManageOrder from './order-voucher/ManageOrder';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -56,13 +58,16 @@ const materialRoutes = [
   { path: '/product/brand', element: <ManageBrand /> },
 
   //order-voucher
-  { path: '/order/list', element: <AppTable /> },
+  { path: '/order/list', element: <ManageOrder /> },
   { path: '/voucher/list', element: <ManageVoucher /> },
 
   //post
   { path: '/content/list', element: <ManagePost /> },
   { path: '/content/category', element: <ManagePostCategory /> },
   { path: '/content/tag', element: <ManagePostTag /> },
+
+  //customer
+  { path: '/customer/list', element: <ManageCustomer /> }
 
 ];
 

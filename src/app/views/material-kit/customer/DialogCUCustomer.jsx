@@ -5,19 +5,16 @@ import {
     DialogContent,
     styled, Grid,
     Typography, IconButton,
-    // CircularProgress,
-    Select, MenuItem,
     InputLabel, FormControlLabel,
-    Switch, FormControl
+    Switch
 } from '@mui/material';
-// import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { message, Upload } from 'antd';
 import { useDispatch } from 'react-redux';
-import { actionCUAdmin } from 'redux/manage/action';
 import { actionUploadOneFile } from 'redux/upload/action';
+import { actionCUCustomer } from 'redux/customer/action';
 
 const DialogTitleRoot = styled(MuiDialogTitle)(({ theme }) => ({
     margin: 0,
@@ -49,7 +46,7 @@ const TextField = styled(TextValidator)(() => ({
     marginBottom: "16px",
 }));
 
-function DialogCUAdmin({ open, handleClose, record, dataRole }) {
+function DialogCUCustomer({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({
         username: '',
@@ -129,13 +126,12 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
             avatar: fileUpload ? avatar : oldFileUpload,
         }
 
-        dispatch(actionCUAdmin(dataPayload));
+        await dispatch(actionCUCustomer(dataPayload));
         handleClose();
         return message.success(messageSuccess);
     };
 
     const uploadProps = {
-        // multiple: true,
         accept: 'image/png,image/jpeg,image/svg+xml,image/webp',
         beforeUpload: (file, fileList) => {
             if (
@@ -266,25 +262,6 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
                                     label={dataSubmit.status ? "Hoạt động" : "Không hoạt động"}
                                     style={{ marginBottom: 12 }}
                                 />
-
-                                <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">Vai trò</InputLabel>
-                                    <Select
-                                        name="role_id"
-                                        labelId="demo-simple-select-label"
-                                        label="Vai trò"
-                                        onChange={handleChange}
-                                        value={dataSubmit.role_id || ""}
-                                        validators={["required"]}
-                                        errorMessages={["Vui lòng nhập vai trò admin!"]}
-                                        style={{ width: '100%', marginBottom: 16 }}
-                                    >
-                                        {dataRole?.map((item, index) => (
-                                            <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
                                 <TextField
                                     type="number"
                                     name="mobile"
@@ -313,4 +290,4 @@ function DialogCUAdmin({ open, handleClose, record, dataRole }) {
     );
 }
 
-export default React.memo(DialogCUAdmin); // DialogCUAdmin
+export default React.memo(DialogCUCustomer); // DialogCUCustomer

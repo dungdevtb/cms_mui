@@ -12,19 +12,21 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
-    Chip
+    Chip,
+    Avatar
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { SimpleCard, Breadcrumb } from "app/components";
-import DialogCUPost from "./DialogCUPost";
 import Button from '@mui/material/Button';
-import { Image, message } from "antd";
+import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
-import { actionGetListPost, actionDeletePost } from "redux/post/action";
+import DialogCUCustomer from "./DialogCUCustomer";
+import { actionLoading } from "redux/home/action";
+import { actionGetListCustomer, actionDeleteCustomer } from "redux/customer/action";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -45,7 +47,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
     },
 }));
 
-const ManagePost = () => {
+const ManageCustomer = () => {
     const dispatch = useDispatch()
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -53,13 +55,12 @@ const ManagePost = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { dataPost } = useSelector(state => ({
-        dataPost: state.postReducer.dataPost
+    const { dataCustomer } = useSelector(state => ({
+        dataCustomer: state.customerReducer.dataCustomer,
     }), shallowEqual)
 
-
     useEffect(() => {
-        dispatch(actionGetListPost())
+        dispatch(actionGetListCustomer())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -76,15 +77,6 @@ const ManagePost = () => {
         setOpen(false)
     }, []);
 
-    const handleDelete = (id) => {
-        if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePost({ id }));
-            if (res) {
-                message.success("Xóa thành công!");
-            }
-        }
-    }
-
     const handleChangePage = (_, newPage) => {
         setPage(newPage);
     };
@@ -96,38 +88,80 @@ const ManagePost = () => {
 
     const handleChangeSearchDelay = _.debounce((event) => {
         event.persist();
-        dispatch(actionGetListPost({ title: event.target.value }))
+        const { name, value } = event.target
+        dispatch(actionGetListCustomer({
+            [name]: value,
+        }))
     }, 500)
 
-    console.log(dataPost, 'dataPost');
+    const handleDelete = (id) => {
+        if (window.confirm("Bạn có muốn xóa?")) {
+            const res = dispatch(actionDeleteCustomer({ id }));
+            if (res) {
+                message.success("Xóa thành công!");
+            }
+        }
+    }
+
+    const handleExportExcel = async () => {
+        dispatch(actionLoading(true))
+        const url = new URL(`${process.env.REACT_APP_API_URL}/api/exportExcel/list-customer`)
+        const accessToken = localStorage.getItem('token')
+        url.searchParams.append('token', accessToken)
+        window.open(url)
+        dispatch(actionLoading(false))
+    }
 
     return (
         <Container>
             <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản lý tin tức", path: "/content/list" }, { name: "Danh sách bài viết" }]} />
+                <Breadcrumb routeSegments={[{ name: "Quản lý khách hàng", path: "/customer/list" }, { name: "Danh sách khách hàng" }]} />
             </Box>
             <SimpleCard title={
                 <div >
-                    <Box width="100%" marginBottom="36px">Danh sách bài viết</Box>
+                    <Box width="100%" marginBottom="36px">Danh sách khách hàng</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                        <TextField
-                            type="text"
-                            name="name"
-                            label="Tìm kiếm theo tiêu đề"
-                            onChange={handleChangeSearchDelay}
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchOutlinedIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <Box>
+                            <TextField
+                                type="text"
+                                name="name"
+                                label="Tìm kiếm theo tên"
+                                onChange={handleChangeSearchDelay}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                style={{ marginRight: '15px' }}
+                            />
 
-                        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                            Thêm mới
-                        </Button>
+                            <TextField
+                                type="email"
+                                name="email"
+                                label="Tìm kiếm theo email"
+                                onChange={handleChangeSearchDelay}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <Button variant="outlined" color="success" onClick={handleExportExcel} style={{ marginRight: 15 }}>
+                                Export Excel
+                            </Button>
+                            {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                                Thêm mới
+                            </Button> */}
+                        </Box>
                     </Box>
                 </div>
             } >
@@ -136,38 +170,30 @@ const ManagePost = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Stt</TableCell>
-                                <TableCell align="center">Hình ảnh</TableCell>
-                                <TableCell align="center">Tiêu đề</TableCell>
-                                <TableCell align="center">Nổi bật</TableCell>
-                                <TableCell align="center">Trạng thái hiển thị</TableCell>
-                                <TableCell align="center">Thứ tự hiển thị</TableCell>
+                                <TableCell align="center">Tên khách hàng</TableCell>
+                                <TableCell align="center">Email</TableCell>
+                                <TableCell align="center">Trạng thái</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
-                            {dataPost?.rows.length > 0
-                                && dataPost?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                            {dataCustomer?.rows.length > 0
+                                && dataCustomer?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="center">
                                             {(page) * rowsPerPage + index + 1}
                                         </TableCell>
+                                        <TableCell align="center">{item.username}</TableCell>
+                                        <TableCell align="center">{item.email}</TableCell>
                                         <TableCell align="center">
-                                            {/* <img src={item.image} width={100} height={100} alt="" /> */}
-                                            <Image src={item.image} width={100} height={100} alt="" />
+                                            <Chip
+                                                avatar={<Avatar alt="avatar_img" src={item.avatar} />}
+                                                label={item.status ? "Hoạt động" : "Không hoạt động"}
+                                                variant="outlined"
+                                                color={item.status ? "primary" : "error"}
+                                            />
                                         </TableCell>
-                                        <TableCell align="center">{item.title}</TableCell>
-                                        <TableCell align="center">
-                                            {item.hot === 1 ?
-                                                <Chip label="Có" color="primary" variant="outlined" />
-                                                : <Chip label="Không" color="error" variant="outlined" />}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {item.status === 1 ?
-                                                <Chip label="Công bố" color="primary" variant="outlined" />
-                                                : <Chip label="Ẩn" color="error" variant="outlined" />}
-                                        </TableCell>
-                                        <TableCell align="center">{item.display_order}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title="Sửa">
                                                 <IconButton>
@@ -192,7 +218,7 @@ const ManagePost = () => {
                         component="div"
                         labelRowsPerPage="Số hàng trên trang"
                         rowsPerPage={rowsPerPage}
-                        count={dataPost?.rows.length}
+                        count={dataCustomer?.rows.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -202,10 +228,11 @@ const ManagePost = () => {
                 </Box>
 
                 {open &&
-                    <DialogCUPost
+                    <DialogCUCustomer
                         open={open}
                         handleClose={handleClose}
                         record={record}
+                    // dataRole={listRole?.rows}
                     />
                 }
             </SimpleCard>
@@ -213,4 +240,4 @@ const ManagePost = () => {
     );
 };
 
-export default ManagePost;
+export default ManageCustomer;
