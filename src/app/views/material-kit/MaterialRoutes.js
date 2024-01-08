@@ -9,6 +9,7 @@ import ManagePostTag from './post/ManagePostTag';
 import ManagePost from './post/ManagePost';
 import ManageCustomer from './customer/ManageCustomer';
 import ManageOrder from './order-voucher/ManageOrder';
+import DetailOrder from './order-voucher/DetailOrder';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -59,6 +60,7 @@ const materialRoutes = [
 
   //order-voucher
   { path: '/order/list', element: <ManageOrder /> },
+  { path: '/order/detail/:id', element: <DetailOrder /> },
   { path: '/voucher/list', element: <ManageVoucher /> },
 
   //post

@@ -1,10 +1,5 @@
 import { Card, Box, styled } from '@mui/material';
 
-const CardRoot = styled(Card)({
-  height: '100%',
-  padding: '20px 24px'
-});
-
 const CardTitle = styled('div')(({ subtitle }) => ({
   fontSize: '1rem',
   fontWeight: '500',
@@ -12,13 +7,38 @@ const CardTitle = styled('div')(({ subtitle }) => ({
   marginBottom: !subtitle && '16px'
 }));
 
-const SimpleCard = ({ children, title, subtitle }) => {
+const CardRoot = styled(Card)({
+  height: '100%',
+  padding: '20px 24px'
+});
+
+const CardRootAuto = styled(Card)({
+  height: 'auto',
+  padding: '20px 24px'
+});
+
+const SimpleCard = ({ children, title, subtitle, height }) => {
   return (
-    <CardRoot elevation={6}>
+    <>
+      {
+        height ?
+          <CardRootAuto elevation={6}>
+            <CardTitle subtitle={subtitle}>{title}</CardTitle>
+            {subtitle && <Box sx={{ mb: 2 }}>{subtitle}</Box>}
+            {children}
+          </CardRootAuto> :
+          <CardRoot elevation={6}>
+            <CardTitle subtitle={subtitle}>{title}</CardTitle>
+            {subtitle && <Box sx={{ mb: 2 }}>{subtitle}</Box>}
+            {children}
+          </CardRoot>
+      }
+      {/* <CardRoot elevation={6}>
       <CardTitle subtitle={subtitle}>{title}</CardTitle>
       {subtitle && <Box sx={{ mb: 2 }}>{subtitle}</Box>}
       {children}
-    </CardRoot>
+    </CardRoot> */}
+    </>
   );
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
     Box,
     Icon,
@@ -12,18 +13,20 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
+    Chip,
+    Avatar,
 } from "@mui/material";
-import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { actionGetListPermission, actionDeletePermission } from "redux/manage/action";
 import { SimpleCard, Breadcrumb } from "app/components";
-import DialogOrder from "./DialogOrder";
-import Button from '@mui/material/Button';
-import { message } from "antd";
-import { useCallback } from "react";
 import _ from 'lodash'
+import { actionGetListOrder } from "redux/order-voucher/action";
+import { formatMoney } from "app/lib/common";
+import moment from "moment";
+import AddToDriveIcon from '@mui/icons-material/AddToDrive';
+import { useNavigate } from "react-router-dom";
+import DetailOrder from "./DetailOrder";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -46,18 +49,20 @@ const StyledTable = styled(Table)(({ theme }) => ({
 
 const ManageOrder = () => {
     const dispatch = useDispatch()
+    let navigate = useNavigate();
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { listPermission } = useSelector(state => ({
-        listPermission: state.manageReducer.listPermission,
+    const { dataOrder } = useSelector(state => ({
+        dataOrder: state.orderReducer.dataOrder,
     }), shallowEqual)
 
     useEffect(() => {
-        dispatch(actionGetListPermission())
+        dispatch(actionGetListOrder())
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -69,6 +74,10 @@ const ManageOrder = () => {
         setOpen(true)
     }, []);
 
+    const handleDetail = useCallback((id) => {
+        navigate(`/order/detail/${id}`)
+    }, [])
+
     const handleClose = useCallback(() => {
         setRecord({})
         setOpen(false)
@@ -76,10 +85,10 @@ const ManageOrder = () => {
 
     const handleDelete = (id) => {
         if (window.confirm("Bạn có muốn xóa?")) {
-            const res = dispatch(actionDeletePermission({ id }));
-            if (res) {
-                message.success("Xóa thành công!");
-            }
+            // const res = dispatch(actionDeletePermission({ id }));
+            // if (res) {
+            //     message.success("Xóa thành công!");
+            // }
         }
     }
 
@@ -93,102 +102,133 @@ const ManageOrder = () => {
     };
 
     const handleChangeSearchDelay = _.debounce((event) => {
-        event.persist();
-        dispatch(actionGetListPermission({ name: event.target.value }))
+        // event.persist();
+        dispatch(actionGetListOrder({ name: event.target.value }))
     }, 500)
 
-    return (
-        <Container>
-            <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/admin/manage" }, { name: "Quản lý quyền" }]} />
-            </Box>
-            <SimpleCard title={
-                <div >
-                    <Box width="100%" marginBottom="36px">Danh sách quyền</Box>
-                    <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                        <TextField
-                            type="text"
-                            name="name"
-                            label="Tìm kiếm theo tên"
-                            onChange={handleChangeSearchDelay}
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchOutlinedIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+    const renderStatus = (status) => {
+        switch (status) {
+            case 0:
+                return <Chip label="Đơn hàng mới" color="primary" variant="outlined" />
+            case 1:
+                return <Chip label="Chờ xử lý" color="primary" variant="outlined" />
+            case 2:
+                return <Chip label="Đang giao hàng" color="info" variant="outlined" />
+            case 3:
+                return <Chip label="Đã giao hàng" color="secondary" variant="outlined" />
+            case 4:
+                return <Chip label="Hủy" color="error" variant="outlined" />
+            case 5:
+                return <Chip label="Thành công" color="success" variant="outlined" />
+            default:
+                break;
+        }
+    }
 
-                        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                            Thêm mới
-                        </Button>
-                    </Box>
+    const renderCustomer = (customer) => {
+        return (
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <div>
+                    <Avatar src={customer.avatar} sx={{ width: 30, height: 30 }} />
                 </div>
-            } >
-                <Box width="100%" overflow="auto">
-                    <StyledTable>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">Stt</TableCell>
-                                <TableCell align="center">Tên quyền</TableCell>
-                                <TableCell align="center">Slug</TableCell>
-                                <TableCell align="center">Thao tác</TableCell>
-                            </TableRow>
-                        </TableHead>
+                <div style={{ marginLeft: "10px" }}>
+                    <div>{customer.username}</div>
+                    <div style={{ color: "#6C778D" }}>{customer.mobile}</div>
+                </div>
+            </div>
+        )
+    }
 
-                        <TableBody>
-                            {listPermission?.rows.length > 0
-                                && listPermission?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell align="center">
-                                            {(page) * rowsPerPage + index + 1}
-                                        </TableCell>
-                                        <TableCell align="center">{item.name}</TableCell>
-                                        <TableCell align="center">{item.slug}</TableCell>
-                                        <TableCell align="center">
-                                            <Tooltip title="Sửa">
-                                                <IconButton>
-                                                    <Icon color="primary" onClick={() => handleClickOpen(item)}>
-                                                        <BorderColorOutlinedIcon />
-                                                    </Icon>
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Xóa">
-                                                <IconButton onClick={() => handleDelete(item?.id)}>
-                                                    <Icon color="error">close</Icon>
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>
+    return (
+        <>
+            {open ?
+                <DetailOrder record={record} open={open} handleClose={handleClose} /> :
+                < Container >
+                    <Box className="breadcrumb">
+                        <Breadcrumb routeSegments={[{ name: "Quản lý đơn hàng", path: "/order/list" }, { name: "Danh sách đơn hàng" }]} />
+                    </Box>
+                    <SimpleCard title={
+                        <div >
+                            <Box width="100%" marginBottom="36px">Danh sách đơn hàng</Box>
+                            <Box width="100%" display={'flex'} justifyContent={'space-between'}>
+                                <TextField
+                                    type="text"
+                                    name="name"
+                                    label="Tìm kiếm theo tên"
+                                    onChange={handleChangeSearchDelay}
+                                    size="small"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchOutlinedIcon />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Box>
+                        </div>
+                    } >
+                        <Box width="100%" overflow="auto">
+                            <StyledTable>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">Stt</TableCell>
+                                        <TableCell align="center">Mã đơn hàng</TableCell>
+                                        <TableCell align="center">Trạng thái đơn hàng</TableCell>
+                                        <TableCell align="center">Ngày đặt</TableCell>
+                                        <TableCell align="center">Khách hàng</TableCell>
+                                        <TableCell align="center">Tổng tiền</TableCell>
+                                        <TableCell align="center">Thao tác</TableCell>
                                     </TableRow>
-                                ))}
-                        </TableBody>
-                    </StyledTable>
-                    <TablePagination
-                        sx={{ px: 2 }}
-                        page={page}
-                        component="div"
-                        labelRowsPerPage="Số hàng trên trang"
-                        rowsPerPage={rowsPerPage}
-                        count={listPermission?.rows.length}
-                        onPageChange={handleChangePage}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        nextIconButtonProps={{ "aria-label": "Next Page" }}
-                        backIconButtonProps={{ "aria-label": "Previous Page" }}
-                    />
-                </Box>
+                                </TableHead>
 
-                {open &&
-                    <DialogOrder
-                        open={open}
-                        handleClose={handleClose}
-                        record={record}
-                    />
-                }
-            </SimpleCard>
-        </Container>
+                                <TableBody>
+                                    {dataOrder?.rows.length > 0
+                                        && dataOrder?.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell align="center">
+                                                    {(page) * rowsPerPage + index + 1}
+                                                </TableCell>
+                                                <TableCell align="center">{item.order_code}</TableCell>
+                                                <TableCell align="center">{renderStatus(item.status)}</TableCell>
+                                                <TableCell align="center">
+                                                    {moment(item.createdAt).format("DD/MM/YYYY")} •{" "}
+                                                    {moment(item.createdAt).format("HH:mm")}
+                                                </TableCell>
+                                                <TableCell align="center">{renderCustomer(item.customer)}</TableCell>
+                                                <TableCell align="center">{formatMoney(item.total) + " VND" || '--'}</TableCell>
+                                                <TableCell align="center">
+                                                    <Tooltip title="Chi tiết">
+                                                        <IconButton>
+                                                            {/* <Icon color="success" onClick={() => handleDetail(item.id)}> */}
+                                                            <Icon color="success" onClick={() => handleClickOpen(item)}>
+                                                                <AddToDriveIcon />
+                                                            </Icon>
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </StyledTable>
+                            <TablePagination
+                                sx={{ px: 2 }}
+                                page={page}
+                                component="div"
+                                labelRowsPerPage="Số hàng trên trang"
+                                rowsPerPage={rowsPerPage}
+                                count={dataOrder?.rows.length}
+                                onPageChange={handleChangePage}
+                                rowsPerPageOptions={[5, 10, 25]}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                nextIconButtonProps={{ "aria-label": "Next Page" }}
+                                backIconButtonProps={{ "aria-label": "Previous Page" }}
+                            />
+                        </Box>
+                    </SimpleCard>
+                </Container >}
+        </>
+
     );
 };
 

@@ -99,7 +99,6 @@ const ManagePost = () => {
         dispatch(actionGetListPost({ title: event.target.value }))
     }, 500)
 
-    console.log(dataPost, 'dataPost');
 
     return (
         <Container>
