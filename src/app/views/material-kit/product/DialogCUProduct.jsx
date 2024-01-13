@@ -12,16 +12,15 @@ import {
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { message, Upload } from 'antd';
 import { actionUploadOneFile } from 'redux/upload/action';
-import { actionGetListCategory, actionGetListBrand, actionCUProduct } from 'redux/product/action';
-import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import _ from 'lodash'
+import { actionCUProduct } from 'redux/product/action';
+import { useDispatch } from "react-redux";
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
 }));
 
-function DialogCUProduct({ open, handleClose, record }) {
+function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
     const [fileUpload, setFileUpload] = useState(null);
@@ -29,22 +28,8 @@ function DialogCUProduct({ open, handleClose, record }) {
         '/assets/images/upload.png'
     );
     const [status, setStatus] = useState(false);
-
     const [colors, setColors] = useState([])
     const [sizes, setSizes] = useState([])
-
-    const { dataBrand, dataCategory } = useSelector(
-        (state) => ({
-            dataBrand: state.productReducer.dataBrand,
-            dataCategory: state.productReducer.dataCategory
-        }),
-        shallowEqual
-    );
-
-    useEffect(() => {
-        dispatch(actionGetListCategory());
-        dispatch(actionGetListBrand());
-    }, [dispatch]);
 
     useEffect(() => {
         if (record && record?.id) {

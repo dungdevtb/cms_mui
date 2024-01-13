@@ -12,7 +12,11 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
-    Chip
+    Chip,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -26,7 +30,8 @@ import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
 import DialogCUProduct from "./DialogCUProduct";
-import { actionGetListProduct, actionDeleteProduct } from 'redux/product/action';
+import { actionGetListProduct, actionDeleteProduct, actionGetListCategory, actionGetListBrand, } from 'redux/product/action';
+import { actionLoading } from "redux/home/action";
 import { formatMoney } from "app/lib/common";
 
 const Container = styled("div")(({ theme }) => ({
@@ -56,15 +61,19 @@ const ManageProduct = () => {
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
 
-    const { dataProduct } = useSelector(
+    const { dataProduct, dataBrand, dataCategory } = useSelector(
         (state) => ({
             dataProduct: state.productReducer.dataProduct,
+            dataBrand: state.productReducer.dataBrand,
+            dataCategory: state.productReducer.dataCategory
         }),
         shallowEqual
     );
 
     useEffect(() => {
         dispatch(actionGetListProduct());
+        dispatch(actionGetListCategory());
+        dispatch(actionGetListBrand());
     }, [dispatch]);
 
 
@@ -101,12 +110,19 @@ const ManageProduct = () => {
     };
 
     const handleChangeSearchDelay = _.debounce((event) => {
-        event.persist();
-        dispatch(actionGetListProduct({ name: event.target.value }))
+        const { name, value } = event.target
+        dispatch(actionGetListProduct({ [name]: value }))
     }, 500)
 
+    const handleExportExcel = async () => {
+        dispatch(actionLoading(true))
+        const url = new URL(`${process.env.REACT_APP_API_URL}/api/exportExcel/list-product`)
+        const accessToken = localStorage.getItem('token')
+        url.searchParams.append('token', accessToken)
+        window.open(url)
+        dispatch(actionLoading(false))
+    }
 
-    // console.log(dataProduct);
     return (
         <Container>
             <Box className="breadcrumb">
@@ -116,24 +132,60 @@ const ManageProduct = () => {
                 <div >
                     <Box width="100%" marginBottom="36px">Danh sách sản phẩm</Box>
                     <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                        <TextField
-                            type="text"
-                            name="name"
-                            label="Tìm kiếm theo tên"
-                            onChange={handleChangeSearchDelay}
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchOutlinedIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                        <Box width="100%" display={'flex'} >
+                            <TextField
+                                type="text"
+                                name="name"
+                                label="Tìm kiếm theo tên"
+                                onChange={handleChangeSearchDelay}
+                                size="small"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchOutlinedIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                style={{ marginRight: 10 }}
+                            />
+                            <FormControl sx={{ minWidth: 180, marginRight: "10px" }} size="small">
+                                <InputLabel id="demo-simple-select-label">Danh mục</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    label="Danh mục"
+                                    name="category_id"
+                                    onChange={handleChangeSearchDelay}
+                                >
+                                    {dataCategory?.rows.map((item) => (
+                                        <MenuItem value={item.id}>{item.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <FormControl sx={{ minWidth: 180, marginRight: "10px" }} size="small">
+                                <InputLabel id="demo-simple-select-label">Brand</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    label="Brand"
+                                    name="brand_id"
+                                    onChange={handleChangeSearchDelay}
+                                >
+                                    {dataBrand?.rows.map((item) => (
+                                        <MenuItem value={item.id}>{item.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
 
-                        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                            Thêm mới
-                        </Button>
+                        <Box width="100%" display={'flex'} justifyContent={'flex-end'}>
+                            <Button variant="outlined" color="success" onClick={handleExportExcel} sx={{ minWidth: 100, marginRight: "10px" }}>
+                                Export Excel
+                            </Button>
+                            <Button variant="outlined" color="primary" onClick={handleClickOpen} sx={{ minWidth: 100 }}>
+                                Thêm mới
+                            </Button>
+                        </Box>
                     </Box>
                 </div>
             } >
@@ -216,6 +268,8 @@ const ManageProduct = () => {
                         open={open}
                         handleClose={handleClose}
                         record={record}
+                        dataBrand={dataBrand}
+                        dataCategory={dataCategory}
                     />
                 }
             </SimpleCard>

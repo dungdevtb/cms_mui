@@ -15,6 +15,7 @@ import {
     InputAdornment,
     Chip,
     Avatar,
+    Button
 } from "@mui/material";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useEffect, useState, useCallback } from "react";
@@ -25,8 +26,8 @@ import { actionGetListOrder } from "redux/order-voucher/action";
 import { formatMoney } from "app/lib/common";
 import moment from "moment";
 import AddToDriveIcon from '@mui/icons-material/AddToDrive';
-import { useNavigate } from "react-router-dom";
 import DetailOrder from "./DetailOrder";
+import { actionLoading } from "redux/home/action";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -49,7 +50,6 @@ const StyledTable = styled(Table)(({ theme }) => ({
 
 const ManageOrder = () => {
     const dispatch = useDispatch()
-    let navigate = useNavigate();
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -74,9 +74,6 @@ const ManageOrder = () => {
         setOpen(true)
     }, []);
 
-    const handleDetail = useCallback((id) => {
-        navigate(`/order/detail/${id}`)
-    }, [])
 
     const handleClose = useCallback(() => {
         setRecord({})
@@ -102,7 +99,6 @@ const ManageOrder = () => {
     };
 
     const handleChangeSearchDelay = _.debounce((event) => {
-        // event.persist();
         dispatch(actionGetListOrder({ name: event.target.value }))
     }, 500)
 
@@ -115,10 +111,8 @@ const ManageOrder = () => {
             case 2:
                 return <Chip label="Đang giao hàng" color="info" variant="outlined" />
             case 3:
-                return <Chip label="Đã giao hàng" color="secondary" variant="outlined" />
-            case 4:
                 return <Chip label="Hủy" color="error" variant="outlined" />
-            case 5:
+            case 4:
                 return <Chip label="Thành công" color="success" variant="outlined" />
             default:
                 break;
@@ -139,6 +133,15 @@ const ManageOrder = () => {
         )
     }
 
+    const handleExportExcel = async () => {
+        dispatch(actionLoading(true))
+        const url = new URL(`${process.env.REACT_APP_API_URL}/api/exportExcel/list-order`)
+        const accessToken = localStorage.getItem('token')
+        url.searchParams.append('token', accessToken)
+        window.open(url)
+        dispatch(actionLoading(false))
+    }
+
     return (
         <>
             {open ?
@@ -151,20 +154,28 @@ const ManageOrder = () => {
                         <div >
                             <Box width="100%" marginBottom="36px">Danh sách đơn hàng</Box>
                             <Box width="100%" display={'flex'} justifyContent={'space-between'}>
-                                <TextField
-                                    type="text"
-                                    name="name"
-                                    label="Tìm kiếm theo tên"
-                                    onChange={handleChangeSearchDelay}
-                                    size="small"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchOutlinedIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
+                                <Box width="100%">
+                                    <TextField
+                                        type="text"
+                                        name="name"
+                                        label="Tìm kiếm theo tên"
+                                        onChange={handleChangeSearchDelay}
+                                        size="small"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchOutlinedIcon />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Box>
+                                <Box width="100%" display={'flex'} justifyContent={'flex-end'}>
+                                    <Button variant="outlined" color="success" onClick={handleExportExcel} sx={{ minWidth: 100, marginRight: "10px" }}>
+                                        Export Excel
+                                    </Button>
+
+                                </Box>
                             </Box>
                         </div>
                     } >
@@ -200,7 +211,6 @@ const ManageOrder = () => {
                                                 <TableCell align="center">
                                                     <Tooltip title="Chi tiết">
                                                         <IconButton>
-                                                            {/* <Icon color="success" onClick={() => handleDetail(item.id)}> */}
                                                             <Icon color="success" onClick={() => handleClickOpen(item)}>
                                                                 <AddToDriveIcon />
                                                             </Icon>

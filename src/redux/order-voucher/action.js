@@ -71,7 +71,7 @@ export const actionUpdateStatusOrder = (payload) => async (dispatch, getState) =
             return checkErrorCode(response?.statusCode, response?.message)
         }
 
-        dispatch(actionGetListVoucher())
+        dispatch(actionGetListOrder())
         dispatch(actionLoading(false))
         return response
     } catch (error) {

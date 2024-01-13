@@ -24,6 +24,7 @@ import Button from '@mui/material/Button';
 import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
+import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 import DialogCUCustomer from "./DialogCUCustomer";
 import { actionLoading } from "redux/home/action";
 import { actionGetListCustomer, actionDeleteCustomer } from "redux/customer/action";
@@ -195,6 +196,13 @@ const ManageCustomer = () => {
                                             />
                                         </TableCell>
                                         <TableCell align="center">
+                                            <Tooltip title="Đi đến giỏ hàng">
+                                                <IconButton>
+                                                    <Icon color="success" onClick={() => handleClickOpen(item)}>
+                                                        <AddToDriveIcon />
+                                                    </Icon>
+                                                </IconButton>
+                                            </Tooltip>
                                             <Tooltip title="Sửa">
                                                 <IconButton>
                                                     <Icon color="primary" onClick={() => handleClickOpen(item)}>
