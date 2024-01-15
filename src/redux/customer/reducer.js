@@ -5,6 +5,9 @@ const initialState = {
         rows: [],
         paging: {}
     },
+    dataCart: {
+
+    }
 };
 
 const reducer = (state = initialState, action) => {
@@ -14,6 +17,12 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 dataCustomer: action.payload
             };
+
+        case Types.SAVE_CART:
+            return {
+                ...state,
+                dataCart: action.payload
+            }
 
         default:
             return state;

@@ -472,11 +472,10 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory })
                                 ))}
                                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 2, ml: 8 }}>
                                     <span onClick={handleAddSize}> + Thêm kích cỡ và số lượng </span>
-                                    <div style={{ marginTop: 20 }}>Tổng số lượng: {handleTotalQuantity()} </div>
+                                    <div style={{ marginTop: 20 }}>Tổng số lượng: {handleTotalQuantity() || record?.quantity} </div>
                                 </Grid>
                             </Grid>
                             <Grid item lg={6} md={6} sm={6} xs={6}>
-                                {/* <InputLabel id="demo-simple-label">Tổng số lượng</InputLabel> */}
                                 <TextField
                                     type="text"
                                     name="display_order"

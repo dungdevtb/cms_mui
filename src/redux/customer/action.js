@@ -71,3 +71,24 @@ export const actionSaveListCustomer = (payload) => ({
     type: Types.SAVE_LIST_CUSTOMER,
     payload
 });
+
+
+export const actionGetDetailCart = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(dispatch(actionLoading(true)));
+        // const { page } = payload
+        let response = await fetchApi(`/api/order/get-detail-cart?customer_id=${payload}`, 'get');
+
+        await dispatch(actionSaveCart(response?.data));
+        dispatch(actionLoading(false));
+        return response?.data;
+    } catch (error) {
+        alert(error || error?.message);
+    }
+};
+
+
+export const actionSaveCart = (payload) => ({
+    type: Types.SAVE_CART,
+    payload
+});

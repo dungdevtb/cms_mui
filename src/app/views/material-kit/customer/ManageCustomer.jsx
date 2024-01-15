@@ -12,8 +12,6 @@ import {
     Tooltip,
     TextField,
     InputAdornment,
-    Chip,
-    Avatar
 } from "@mui/material";
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -27,7 +25,8 @@ import _ from 'lodash'
 import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 import DialogCUCustomer from "./DialogCUCustomer";
 import { actionLoading } from "redux/home/action";
-import { actionGetListCustomer, actionDeleteCustomer } from "redux/customer/action";
+import { actionGetListCustomer, actionDeleteCustomer, actionGetDetailCart } from "redux/customer/action";
+import DialogCart from "./DialogCart";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -54,14 +53,18 @@ const ManageCustomer = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const [open, setOpen] = useState(false);
+    const [openCart, setOpenCart] = useState(false);
     const [record, setRecord] = useState({});
+    const [dataCart, setDataCart] = useState({});
 
     const { dataCustomer } = useSelector(state => ({
         dataCustomer: state.customerReducer.dataCustomer,
     }), shallowEqual)
 
     useEffect(() => {
-        dispatch(actionGetListCustomer())
+        (async () => {
+            await dispatch(actionGetListCustomer())
+        })()
     }, [dispatch])
 
     const handleClickOpen = useCallback((itemEdit) => {
@@ -76,6 +79,18 @@ const ManageCustomer = () => {
     const handleClose = useCallback(() => {
         setRecord({})
         setOpen(false)
+    }, []);
+
+    const handleOpenCart = useCallback(async (id) => {
+        const res = await dispatch(actionGetDetailCart(id))
+        // if (res) {
+        setDataCart(res)
+        setOpenCart(true)
+        // }
+    }, [])
+
+    const handleCloseCart = useCallback(() => {
+        setOpenCart(false)
     }, []);
 
     const handleChangePage = (_, newPage) => {
@@ -173,7 +188,6 @@ const ManageCustomer = () => {
                                 <TableCell align="center">Stt</TableCell>
                                 <TableCell align="center">Tên khách hàng</TableCell>
                                 <TableCell align="center">Email</TableCell>
-                                <TableCell align="center">Trạng thái</TableCell>
                                 <TableCell align="center">Thao tác</TableCell>
                             </TableRow>
                         </TableHead>
@@ -187,18 +201,11 @@ const ManageCustomer = () => {
                                         </TableCell>
                                         <TableCell align="center">{item.username}</TableCell>
                                         <TableCell align="center">{item.email}</TableCell>
-                                        <TableCell align="center">
-                                            <Chip
-                                                avatar={<Avatar alt="avatar_img" src={item.avatar} />}
-                                                label={item.status ? "Hoạt động" : "Không hoạt động"}
-                                                variant="outlined"
-                                                color={item.status ? "primary" : "error"}
-                                            />
-                                        </TableCell>
+
                                         <TableCell align="center">
                                             <Tooltip title="Đi đến giỏ hàng">
                                                 <IconButton>
-                                                    <Icon color="success" onClick={() => handleClickOpen(item)}>
+                                                    <Icon color="success" onClick={() => handleOpenCart(item?.id)}>
                                                         <AddToDriveIcon />
                                                     </Icon>
                                                 </IconButton>
@@ -243,6 +250,15 @@ const ManageCustomer = () => {
                     // dataRole={listRole?.rows}
                     />
                 }
+
+                {openCart &&
+                    <DialogCart
+                        open={openCart}
+                        handleClose={handleCloseCart}
+                        dataCart={dataCart}
+                    />
+                }
+
             </SimpleCard>
         </Container>
     );
