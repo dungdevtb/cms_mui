@@ -33,6 +33,7 @@ import DialogCUProduct from "./DialogCUProduct";
 import { actionGetListProduct, actionDeleteProduct, actionGetListCategory, actionGetListBrand, } from 'redux/product/action';
 import { actionLoading } from "redux/home/action";
 import { formatMoney } from "app/lib/common";
+import DialogRatingProduct from "./DialogRatingProduct";
 
 const Container = styled("div")(({ theme }) => ({
     margin: "30px",
@@ -60,6 +61,9 @@ const ManageProduct = () => {
 
     const [open, setOpen] = useState(false);
     const [record, setRecord] = useState({});
+
+    const [openRating, setOpenRating] = useState(false);
+    const [dataRating, setDataRating] = useState([]);
 
     const { dataProduct, dataBrand, dataCategory } = useSelector(
         (state) => ({
@@ -89,6 +93,20 @@ const ManageProduct = () => {
     const handleClose = useCallback(() => {
         setRecord({})
         setOpen(false)
+    }, []);
+
+    const handleOpenRating = useCallback((itemRating) => {
+        if (itemRating) {
+            setDataRating(itemRating)
+        } else {
+            setDataRating([])
+        }
+        setOpenRating(true)
+    }, []);
+
+    const handleCloseRating = useCallback(() => {
+        setDataRating([])
+        setOpenRating(false)
     }, []);
 
     const handleDelete = (id) => {
@@ -226,7 +244,7 @@ const ManageProduct = () => {
                                         <TableCell align="center">
                                             <Tooltip title="Đánh giá sp">
                                                 <IconButton>
-                                                    <Icon color="success" onClick={() => handleClickOpen(item)}>
+                                                    <Icon color="success" onClick={() => handleOpenRating(item?.comments)}>
                                                         <AddToDriveIcon />
                                                     </Icon>
                                                 </IconButton>
@@ -270,6 +288,14 @@ const ManageProduct = () => {
                         record={record}
                         dataBrand={dataBrand}
                         dataCategory={dataCategory}
+                    />
+                }
+
+                {openRating &&
+                    <DialogRatingProduct
+                        open={openRating}
+                        handleClose={handleCloseRating}
+                        dataRating={dataRating}
                     />
                 }
             </SimpleCard>

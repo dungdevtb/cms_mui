@@ -54,7 +54,7 @@ function DialogCUCustomer({ open, handleClose, record }) {
         address: '',
         mobile: '',
         role_id: 0,
-        status: false
+        // status: false
     })
 
     const [fileUpload, setFileUpload] = useState(null);
@@ -71,7 +71,7 @@ function DialogCUCustomer({ open, handleClose, record }) {
                 address: record.address,
                 role_id: record?.user_role?.role?.id,
                 mobile: record.mobile,
-                status: record?.status === 1 ? true : false
+                // status: record?.status === 1 ? true : false
             })
             if (record?.avatar) {
                 setOldFileUpload(record?.avatar)
@@ -91,14 +91,14 @@ function DialogCUCustomer({ open, handleClose, record }) {
                 // [name]: type === 'checkbox' ? checked : value
                 id: record.id,
                 [name]: value,
-                status: checked === true ? 1 : 0
+                // status: checked === true ? 1 : 0
             }));
         } else {
             setDataSubmit((prevData) => ({
                 ...prevData,
                 // [name]: type === 'checkbox' ? checked : value
                 [name]: value,
-                status: checked === true ? 1 : 0
+                // status: checked === true ? 1 : 0
             }));
         }
     };
@@ -256,12 +256,14 @@ function DialogCUCustomer({ open, handleClose, record }) {
                                 />
                             </Grid>
                             <Grid item lg={6} md={6} sm={12} xs={12} >
-                                <InputLabel id="demo-simple-switch-label">Trạng thái người dùng</InputLabel>
+                                {/*
+                               <InputLabel id="demo-simple-switch-label">Trạng thái người dùng</InputLabel>
                                 <FormControlLabel
                                     control={<Switch checked={dataSubmit.status} onChange={handleChange} name='status' />}
                                     label={dataSubmit.status ? "Hoạt động" : "Không hoạt động"}
                                     style={{ marginBottom: 12 }}
                                 />
+                               */}
                                 <TextField
                                     type="number"
                                     name="mobile"

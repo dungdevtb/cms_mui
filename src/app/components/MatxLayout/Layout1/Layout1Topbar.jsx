@@ -110,8 +110,6 @@ const Layout1Topbar = () => {
     })();
   }, [dispatch])
 
-  console.log();
-
   const handleSidebarToggle = () => {
     let { layout1Settings } = settings;
     let mode;
@@ -122,7 +120,6 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
-
 
   const handleLogout = async () => {
     try {

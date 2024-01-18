@@ -12,7 +12,6 @@ export const actionLogin = (payload) => async (dispatch, getState) => {
     try {
         const response = await fetchApi('/login', 'post', payload)
 
-
         if (response.statusCode !== 200) {
             dispatch(actionLoading(false))
             return checkErrorCode(response?.statusCode, response?.message)
