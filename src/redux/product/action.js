@@ -214,3 +214,75 @@ export const actionSaveListBrand = (payload) => ({
   type: Types.SAVE_LIST_BRAND,
   payload
 });
+
+
+//**************************ProductType************************ */
+export const actionGetListProductType = (payload) => async (dispatch, getState) => {
+  try {
+    dispatch(dispatch(actionLoading(true)));
+    // const { page } = payload
+    let response = await fetchApi('/api/product_type/get_list_product_type', 'get', payload);
+
+    if (response.statusCode !== 200) {
+      dispatch(dispatch(actionLoading(false)));
+      return checkErrorCode(response?.statusCode, response?.message);
+    }
+
+    // response.data = {
+    //     ...response.data,
+    //     paging: {
+    //         page: page || 1,
+    //         total: response?.data?.total || 0,
+    //         count: Math.ceil(response?.data?.total / 10),//10:Limit page default
+    //         limit: 10
+    //     }
+    // }
+
+    await dispatch(actionSaveListProductType(response?.data));
+    dispatch(actionLoading(false));
+    return response?.data;
+  } catch (error) {
+    alert(error || error?.message);
+  }
+};
+
+export const actionCUProductType = (payload) => async (dispatch, getState) => {
+  try {
+    dispatch(actionLoading(true))
+    let response = await fetchApi('/api/product_type/create_update_product_type', 'post', payload)
+
+    if (response.statusCode !== 200) {
+      dispatch(actionLoading(false))
+      return checkErrorCode(response?.statusCode, response?.message)
+    }
+
+    dispatch(actionGetListProductType())
+    dispatch(actionLoading(false))
+    return response
+  } catch (error) {
+    alert(error || error?.message)
+  }
+}
+
+export const actionDeleteProductType = (payload) => async (dispatch, getState) => {
+  try {
+    dispatch(actionLoading(true))
+    const { id } = payload
+    let response = await fetchApi(`/api/product_type/delete_product_type/${id}`, 'post')
+    if (response.statusCode !== 200) {
+      dispatch(actionLoading(false))
+      return checkErrorCode(response?.statusCode, response?.message)
+    }
+
+    dispatch(actionGetListProductType())
+    dispatch(actionLoading(false))
+    return response?.data
+  } catch (error) {
+    alert(error || error?.message)
+  }
+}
+
+export const actionSaveListProductType = (payload) => ({
+  type: Types.SAVE_LIST_PRODUCT_TYPE,
+  payload
+});

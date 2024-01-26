@@ -20,7 +20,7 @@ const TextField = styled(TextValidator)(() => ({
     marginBottom: "16px",
 }));
 
-function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory }) {
+function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, dataProductType }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
     const [fileUpload, setFileUpload] = useState(null);
@@ -42,6 +42,7 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory })
                 sell_price: record?.sell_price,
                 category_id: record?.category?.id,
                 brand_id: record?.brand?.id,
+                product_type_id: record?.product_type?.id,
                 display_order: record?.display_order,
                 // status: record?.status === 1 ? true : false
             })
@@ -367,6 +368,24 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory })
                                     size="small"
                                 >
                                     {dataCategory?.rows?.map((item, index) => (
+                                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+
+                            <Grid item lg={12} md={12} sm={12} xs={12} >
+                                <InputLabel id="demo-simple-select-label">Loại sản phẩm</InputLabel>
+                                <Select
+                                    name="product_type_id"
+                                    labelId="demo-simple-select-label"
+                                    onChange={handleChange}
+                                    value={dataSubmit?.product_type_id || ""}
+                                    validators={["required"]}
+                                    errorMessages={["Vui lòng nhập danh mục!"]}
+                                    style={{ width: '100%', marginBottom: 16 }}
+                                    size="small"
+                                >
+                                    {dataProductType?.rows?.map((item, index) => (
                                         <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
                                     ))}
                                 </Select>

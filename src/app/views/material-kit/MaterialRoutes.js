@@ -3,6 +3,7 @@ import Loadable from 'app/components/Loadable';
 import ManageProduct from './product/ManageProduct';
 import ManageCategory from './product/MannageCategory';
 import ManageBrand from './product/ManageBrand';
+import ManageProductType from './product/ManageProductType';
 import ManageVoucher from './order-voucher/ManageVoucher';
 import ManagePostCategory from './post/ManagePostCategory';
 import ManagePostTag from './post/ManagePostTag';
@@ -57,6 +58,7 @@ const materialRoutes = [
   { path: '/product/list', element: <ManageProduct /> },
   { path: '/product/category', element: <ManageCategory /> },
   { path: '/product/brand', element: <ManageBrand /> },
+  { path: '/product/product-type', element: <ManageProductType /> },
 
   //order-voucher
   { path: '/order/list', element: <ManageOrder /> },

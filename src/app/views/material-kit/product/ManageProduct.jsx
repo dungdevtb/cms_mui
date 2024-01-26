@@ -30,7 +30,7 @@ import { message } from "antd";
 import { useCallback } from "react";
 import _ from 'lodash'
 import DialogCUProduct from "./DialogCUProduct";
-import { actionGetListProduct, actionDeleteProduct, actionGetListCategory, actionGetListBrand, } from 'redux/product/action';
+import { actionGetListProduct, actionDeleteProduct, actionGetListCategory, actionGetListBrand, actionGetListProductType } from 'redux/product/action';
 import { actionLoading } from "redux/home/action";
 import { formatMoney } from "app/lib/common";
 import DialogRatingProduct from "./DialogRatingProduct";
@@ -65,11 +65,12 @@ const ManageProduct = () => {
     const [openRating, setOpenRating] = useState(false);
     const [dataRating, setDataRating] = useState([]);
 
-    const { dataProduct, dataBrand, dataCategory } = useSelector(
+    const { dataProduct, dataBrand, dataCategory, dataProductType } = useSelector(
         (state) => ({
             dataProduct: state.productReducer.dataProduct,
             dataBrand: state.productReducer.dataBrand,
-            dataCategory: state.productReducer.dataCategory
+            dataCategory: state.productReducer.dataCategory,
+            dataProductType: state.productReducer.dataProductType
         }),
         shallowEqual
     );
@@ -78,6 +79,7 @@ const ManageProduct = () => {
         dispatch(actionGetListProduct());
         dispatch(actionGetListCategory());
         dispatch(actionGetListBrand());
+        dispatch(actionGetListProductType());
     }, [dispatch]);
 
 
@@ -288,6 +290,7 @@ const ManageProduct = () => {
                         record={record}
                         dataBrand={dataBrand}
                         dataCategory={dataCategory}
+                        dataProductType={dataProductType}
                     />
                 }
 

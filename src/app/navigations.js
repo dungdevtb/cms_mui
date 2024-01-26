@@ -46,6 +46,9 @@ export const navigations = [
       { name: 'Danh sách sản phẩm', iconText: 'SI', path: '/product/list' },
       { name: 'Danh sách brand', iconText: 'FG', path: '/product/brand' },
       { name: 'Quản lý danh mục', iconText: 'SU', path: '/product/category' },
+      { name: 'Danh sách loại sản phẩm', iconText: 'SU', path: '/product/product-type' },
+
+
     ]
   },
   {
