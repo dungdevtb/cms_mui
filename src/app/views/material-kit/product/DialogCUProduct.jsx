@@ -14,6 +14,7 @@ import { message, Upload } from 'antd';
 import { actionUploadOneFile } from 'redux/upload/action';
 import { actionCUProduct } from 'redux/product/action';
 import { useDispatch } from "react-redux";
+import InputAdornment from '@mui/material/InputAdornment';
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -44,6 +45,8 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, d
                 brand_id: record?.brand?.id,
                 product_type_id: record?.product_type?.id,
                 display_order: record?.display_order,
+                discount: record?.discount,
+                discount_price: record?.discount_price,
                 // status: record?.status === 1 ? true : false
             })
 
@@ -283,6 +286,7 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, d
         setStatus(e.target.checked);
     }
 
+
     return (
         <Box>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth='md'>
@@ -322,6 +326,9 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, d
                                     name="import_price"
                                     label="Giá nhập"
                                     value={dataSubmit?.import_price || ""}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">vnd</InputAdornment>,
+                                    }}
                                     onChange={handleChange}
                                     size="small"
                                 />
@@ -332,6 +339,35 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, d
                                     name="sell_price"
                                     label="Giá bán"
                                     value={dataSubmit?.sell_price || ""}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">vnd</InputAdornment>,
+                                    }}
+                                    onChange={handleChange}
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <TextField
+                                    type="text"
+                                    name="discount"
+                                    label="Discount"
+                                    value={dataSubmit?.discount || ""}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                    }}
+                                    onChange={handleChange}
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item lg={6} md={6} sm={6} xs={6}>
+                                <TextField
+                                    type="text"
+                                    name="discount_price"
+                                    label="Giá giảm"
+                                    value={dataSubmit?.discount_price || ""}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">vnd</InputAdornment>,
+                                    }}
                                     onChange={handleChange}
                                     size="small"
                                 />
