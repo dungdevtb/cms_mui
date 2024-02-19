@@ -70,6 +70,14 @@ export const navigations = [
     ]
   },
   {
+    name: 'Quản lý banner',
+    icon: 'person',
+    children: [
+      { name: 'Danh sách banner', iconText: 'SI', path: '/banner/list' },
+
+    ]
+  },
+  {
     name: 'Quản lý giao dịch',
     icon: 'monetization_on',
     children: [

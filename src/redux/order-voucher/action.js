@@ -154,3 +154,63 @@ export const actionSaveListVoucher = (payload) => ({
     type: Types.SAVE_LIST_VOUCHER,
     payload
 });
+
+//**************************Banner************************ */
+export const actionGetListBanner = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(dispatch(actionLoading(true)));
+        let response = await fetchApi('/api/banner/get-list-banner', 'get', payload);
+
+        if (response.statusCode !== 200) {
+            dispatch(dispatch(actionLoading(false)));
+            return checkErrorCode(response?.statusCode, response?.message);
+        }
+
+        await dispatch(actionSaveListBanner(response?.data));
+        dispatch(actionLoading(false));
+        return response?.data;
+    } catch (error) {
+        alert(error || error?.message);
+    }
+};
+
+export const actionCUBanner = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(actionLoading(true))
+        let response = await fetchApi('/api/banner/create-update-banner', 'post', payload)
+
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+
+        dispatch(actionGetListBanner())
+        dispatch(actionLoading(false))
+        return response
+    } catch (error) {
+        alert(error || error?.message)
+    }
+}
+
+export const actionDeleteBanner = (payload) => async (dispatch, getState) => {
+    try {
+        dispatch(actionLoading(true))
+        const { id } = payload
+        let response = await fetchApi(`/api/banner/delete-banner/${id}`, 'post')
+        if (response.statusCode !== 200) {
+            dispatch(actionLoading(false))
+            return checkErrorCode(response?.statusCode, response?.message)
+        }
+
+        dispatch(actionGetListBanner())
+        dispatch(actionLoading(false))
+        return response?.data
+    } catch (error) {
+        alert(error || error?.message)
+    }
+}
+
+export const actionSaveListBanner = (payload) => ({
+    type: Types.SAVE_LIST_BANNER,
+    payload
+});

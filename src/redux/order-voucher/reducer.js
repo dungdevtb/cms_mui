@@ -9,6 +9,9 @@ const initialState = {
         rows: [],
         paging: {}
     },
+    dataBanner: {
+        rows: [],
+    }
 
 };
 
@@ -24,6 +27,12 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 dataVoucher: action.payload
             };
+
+        case Types.SAVE_LIST_BANNER:
+            return {
+                ...state,
+                dataBanner: action.payload
+            }
 
         default:
             return state;

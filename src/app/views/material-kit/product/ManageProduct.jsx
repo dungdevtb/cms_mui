@@ -146,7 +146,7 @@ const ManageProduct = () => {
     return (
         <Container>
             <Box className="breadcrumb">
-                <Breadcrumb routeSegments={[{ name: "Quản trị hệ thống", path: "/dashboard" }, { name: "Quản lý kho hàng" }]} />
+                <Breadcrumb routeSegments={[{ name: "Quản lý kho hàng" }, { name: "Danh sách sản phẩm", path: "/product/list" }]} />
             </Box>
             <SimpleCard title={
                 <div >

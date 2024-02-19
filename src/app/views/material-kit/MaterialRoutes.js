@@ -11,6 +11,7 @@ import ManagePost from './post/ManagePost';
 import ManageCustomer from './customer/ManageCustomer';
 import ManageOrder from './order-voucher/ManageOrder';
 import DetailOrder from './order-voucher/DetailOrder';
+import ManageBanner from './banner/ManageBanner';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -71,7 +72,10 @@ const materialRoutes = [
   { path: '/content/tag', element: <ManagePostTag /> },
 
   //customer
-  { path: '/customer/list', element: <ManageCustomer /> }
+  { path: '/customer/list', element: <ManageCustomer /> },
+
+  //banner
+  { path: '/banner/list', element: <ManageBanner /> },
 
 ];
 

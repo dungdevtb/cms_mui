@@ -89,7 +89,6 @@ const formRef = React.createRef()
 function DialogCUVoucher({ open, handleClose, record }) {
     const dispatch = useDispatch()
     const [dataSubmit, setDataSubmit] = useState({})
-    let date = moment("2000-01-01T00:00:00.000Z").format("DD/MM/YYYY HH:mm:ss")
     const [minDate, setMinDate] = useState(null);
     const [maxDate, setMaxDate] = useState(null);
     const editorCore = useRef(null);
@@ -137,8 +136,6 @@ function DialogCUVoucher({ open, handleClose, record }) {
             //     start: moment(record.start),
             //     exp: moment(record.exp),
             // })
-
-            console.log(record, 'record');
         }
     }, [])
 
