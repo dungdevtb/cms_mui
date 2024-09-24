@@ -7,7 +7,8 @@ import manageReducer from './manage/reducer';
 import productReducer from './product/reducer';
 import orderReducer from './order-voucher/reducer';
 import postReducer from './post/reducer';
-import customerReducer from './customer/reducer'
+import customerReducer from './customer/reducer';
+import guitarReducer from './guitar/reducer';
 
 export const rootReducer = combineReducers({
   auth: auth.reducer,
@@ -16,7 +17,8 @@ export const rootReducer = combineReducers({
   productReducer: productReducer,
   orderReducer: orderReducer,
   postReducer: postReducer,
-  customerReducer: customerReducer
+  customerReducer: customerReducer,
+  guitarReducer: guitarReducer
 });
 
 export function* rootSaga() {

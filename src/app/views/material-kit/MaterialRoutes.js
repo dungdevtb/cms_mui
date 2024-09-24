@@ -12,6 +12,7 @@ import ManageCustomer from './customer/ManageCustomer';
 import ManageOrder from './order-voucher/ManageOrder';
 import DetailOrder from './order-voucher/DetailOrder';
 import ManageBanner from './banner/ManageBanner';
+import ListGuitar from './guitar/ListGuitar';
 
 const AppTable = Loadable(lazy(() => import('./tables/AppTable')));
 const AppForm = Loadable(lazy(() => import('./forms/AppForm')));
@@ -53,6 +54,8 @@ const materialRoutes = [
   { path: '/admin/manage', element: <ManageAdmin /> },
   { path: '/admin/role', element: <ManageRole /> },
   { path: '/admin/permission', element: <ManagePermission /> },
+
+  { path: 'guitar/list', element: <ListGuitar /> },
 
   //product
   //manage

@@ -40,6 +40,11 @@ export const navigations = [
     ]
   },
   {
+    name: 'Danh sách guitar',
+    icon: 'build',
+    path: 'guitar/list'
+  },
+  {
     name: 'Quản lý kho hàng',
     icon: 'shopping_cart',
     children: [

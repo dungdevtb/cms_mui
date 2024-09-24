@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 // third party style
-import 'perfect-scrollbar/css/perfect-scrollbar.css';
+// import 'perfect-scrollbar/css/perfect-scrollbar.css';
 
 const root = createRoot(document.getElementById('root'));
 

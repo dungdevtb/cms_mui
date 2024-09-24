@@ -285,8 +285,7 @@ function DialogCUProduct({ open, handleClose, record, dataBrand, dataCategory, d
     const handleSwitch = (e) => {
         setStatus(e.target.checked);
     }
-
-
+    
     return (
         <Box>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth='md'>
